@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}AI Assistant{% endblock %}
+
+{% block body %}
+<div class="row border h-75">
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="systemInput">System</label>
+            <textarea type="text" class=" form-control" id="systemInput" placeholder="Enter system command or info"> </textarea>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="chat-box" id="chatBox">
+            <!-- Here the conversation will be displayed -->
+        </div>
+        <div class="input-section">
+            <div class="input-group">
+                <input type="text" class="form-control" id="userInput" placeholder="Type your message...">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function sendMessage() {
+        let userInput = document.getElementById('userInput').value;
+        if (userInput.trim() !== '') {
+            let chatBox = document.getElementById('chatBox');
+            let userMessage = document.createElement('div');
+            userMessage.className = 'user-message';
+            userMessage.textContent = 'User: ' + userInput;
+            chatBox.appendChild(userMessage);
+
+            // Here you would typically send the message to the server and get a response
+            let aiMessage = document.createElement('div');
+            aiMessage.className = 'ai-message';
+            aiMessage.textContent = 'AI: ' + getAIResponse(userInput);
+            chatBox.appendChild(aiMessage);
+
+            document.getElementById('userInput').value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    }
+
+    function getAIResponse(message) {
+        // This function would be replaced with actual logic to get AI response
+        return 'This is a placeholder response to "' + message + '".';
+    }
+</script>
+{% endblock %}
