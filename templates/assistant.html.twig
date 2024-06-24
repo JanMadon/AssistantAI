@@ -25,30 +25,8 @@
     </div>
 </div>
 
-<script>
-    function sendMessage() {
-        let userInput = document.getElementById('userInput').value;
-        if (userInput.trim() !== '') {
-            let chatBox = document.getElementById('chatBox');
-            let userMessage = document.createElement('div');
-            userMessage.className = 'user-message';
-            userMessage.textContent = 'User: ' + userInput;
-            chatBox.appendChild(userMessage);
-
-            // Here you would typically send the message to the server and get a response
-            let aiMessage = document.createElement('div');
-            aiMessage.className = 'ai-message';
-            aiMessage.textContent = 'AI: ' + getAIResponse(userInput);
-            chatBox.appendChild(aiMessage);
-
-            document.getElementById('userInput').value = '';
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-    }
-
-    function getAIResponse(message) {
-        // This function would be replaced with actual logic to get AI response
-        return 'This is a placeholder response to "' + message + '".';
-    }
-</script>
+    {% block javascripts %}
+        <script>   var dataUrl = "{{ path('assistent_prompt') }}"; </script>
+        <script src="{{ asset('js/assistent.js') }}"></script>
+    {% endblock %}
 {% endblock %}
