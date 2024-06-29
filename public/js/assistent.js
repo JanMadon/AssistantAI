@@ -1,4 +1,5 @@
-function sendMessage() {
+async function sendMessage() {
+    let systemInput = document.getElementById('systemInput').value;
     let userInput = document.getElementById('userInput').value;
     let conversation = document.getElementById('chatBox')
     if (userInput.trim() !== '') {
@@ -7,13 +8,10 @@ function sendMessage() {
         userMessage.className = 'conversion'
         userMessage.textContent = 'User: ' + userInput;
         chatBox.appendChild(userMessage);
-
-        console.log(getAIResponse(conversation));
         
-        // Here you would typically send the message to the server and get a response
         let aiMessage = document.createElement('div');
         aiMessage.className = 'conversion';
-        aiMessage.textContent = 'AI: ' + getAIResponse(conversation);
+        aiMessage.textContent = 'AI: ' + await getAIResponse(systemInput, conversation);
         chatBox.appendChild(aiMessage);
 
         document.getElementById('userInput').value = '';
@@ -21,7 +19,8 @@ function sendMessage() {
     }
 }
 
-function getAIResponse(messages) {
+async function getAIResponse(system, messages) {
+
     messages = messages.getElementsByClassName('conversion')
     const conversation = []; 
 
@@ -29,23 +28,27 @@ function getAIResponse(messages) {
         message = (message.textContent).split(':');
         let $site = message.shift();
 
-        console.log($site);
         if($site === 'User'){
-            conversation.push({'User': message})
+            conversation.push({'User': message[0]})
         }else if ($site === 'AI') {
-            conversation.push({'AI': message})
+            conversation.push({'AI': message[0]})
         } else {
             console.error($site)
         }
     }
-
-    return askChat(conversation)
+    return await askChat(system, conversation)
 }
 
-async function askChat(conversation) {
+async function askChat(system, conversation) {
    
+    const data = {
+        'system': system,
+        'conversation': conversation
+    }
+    console.log(JSON.stringify(data))
+
     try {
-        const response = await axios.post(dataUrl, conversation)
+        const response = await axios.post(dataUrl, data)
         console.log(response);
         return response.data
     } catch (error) {
