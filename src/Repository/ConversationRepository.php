@@ -40,4 +40,14 @@ class ConversationRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function findOrCreate(?int $id){
+        if($id){
+            $conversation = $this->find($id);
+        } else {
+            $conversation = new Conversation;
+        }
+        return $conversation;
+
+    }
 }
