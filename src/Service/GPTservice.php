@@ -67,16 +67,16 @@ class GPTservice {
     {
         $preparedConversation = [];
         foreach ($converstion as $messages) {
-            if (array_keys(get_object_vars($messages))[0] === 'User') {
+            if (array_keys($messages)[0] === 'User') {
                 $preparedConversation[] = [
                     'role' => 'user',
-                    'content' => $messages->User
+                    'content' => $messages['User']
                 ];
             }
-            if (array_keys(get_object_vars($messages))[0] === 'AI') {
+            if (array_keys($messages)[0] === 'AI') {
                 $preparedConversation[] = [
                     'role' => 'assistant',
-                    'content' => $messages->AI
+                    'content' => $messages['AI']
                 ];
             }
         }

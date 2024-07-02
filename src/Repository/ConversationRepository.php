@@ -48,6 +48,11 @@ class ConversationRepository extends ServiceEntityRepository
             $conversation = new Conversation;
         }
         return $conversation;
+    }
 
+    public function getLastEntryId(): ?int
+    {
+        $entity = $this->findOneBy([], ['id' => 'DESC']);
+        return $entity ? $entity->getId() : 0;
     }
 }
