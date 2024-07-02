@@ -18,7 +18,7 @@ class Message
     private ?string $author = null;
 
     #[ORM\ManyToOne(inversedBy: 'messages')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Conversation $conversation = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]

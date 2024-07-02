@@ -26,7 +26,7 @@ class Conversation
      * @var Collection<int, Message>
      */
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'Conversation')]
-    private Collection $messages;
+    private ?Collection $messages = null;
 
     public function __construct()
     {
