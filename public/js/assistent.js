@@ -1,3 +1,6 @@
+let conversation_id = null;
+
+
 async function sendMessage() {
     let systemInput = document.getElementById('systemInput').value;
     let userInput = document.getElementById('userInput').value;
@@ -40,8 +43,8 @@ async function getAIResponse(system, messages) {
 }
 
 async function askChat(system, conversation) {
-   
     const data = {
+        'id': conversation_id,
         'system': system,
         'conversation': conversation
     }
@@ -49,8 +52,9 @@ async function askChat(system, conversation) {
 
     try {
         const response = await axios.post(dataUrl, data)
-        console.log(response);
-        return response.data
+        conversation_id = response.data.id
+        return response.data.answer
+
     } catch (error) {
         console.error(error)
         return null
