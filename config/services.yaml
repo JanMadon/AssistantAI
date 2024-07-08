@@ -8,6 +8,9 @@ parameters:
     API_KEY_OPENAI: '%env(API_KEY_OPENAI)%'
     API_KEY_RENDER_FORM: '%env(API_KEY_RENDER_FORM)%'
     API_KEY_SERPAPI: '%env(API_KEY_SERPAPI)%'
+    SERVER_WHATSAPP: '%env(SERVER_WHATSAPP)%'
+                      
+
 
 
 services:
