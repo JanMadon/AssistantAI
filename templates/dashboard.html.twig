@@ -1,44 +1,9 @@
-{% extends 'layout/base.html.twig' %}
+{% extends 'base.html.twig' %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}index{% endblock %}
 
 {% block body %}
-<div class="row">
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Profile</h5>
-                <p class="card-text">Manage your profile details.</p>
-                <a href="#" class="btn btn-primary">Go to Profile</a>
-            </div>
-        </div>
+    <div id="app">
+        <App /> 
     </div>
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Settings</h5>
-                <p class="card-text">Adjust your account settings.</p>
-                <a href="#" class="btn btn-primary">Go to Settings</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Messages</h5>
-                <p class="card-text">Check your messages.</p>
-                <a href="#" class="btn btn-primary">Go to Messages</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Notifications</h5>
-                <p class="card-text">View your notifications.</p>
-                <a href="#" class="btn btn-primary">Go to Notifications</a>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock %}
