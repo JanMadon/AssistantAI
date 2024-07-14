@@ -29,29 +29,29 @@ class AssistantController extends AbstractController
         $this->conversationRepository = $conversationRepository;
     }
 
-    #[Route('/assistant', 'assistant')]
+    #[Route('/assistant', 'assistant', methods: ['GET'])]
     public function assistant(Request $request): Response
     {
         // $number = random_int(0, 100);
         // dd($this->getParameter('API_KEY_AIDEVS')); 
 
         // TODO: tezba bedzie pobrać z db ostatnią rozmwę;
-       
+
         //dd($this->conversationRepository->getLastEntryId());
 
         return $this->render('assistant.html.twig');
     }
 
-    #[Route('/api/assistant/prompt', 'assistent_prompt')]
+    #[Route('/api/assistant/prompt', 'assistent_prompt', methods:['POST'])]
     public function assistantConversation(Request $request, EntityManagerInterface $entityManager): Response
     {
         // request {id,system, conversation}
         $request = json_decode($request->getContent(), true);
         $mesageUser = end($request['conversation']);
-        $conversationId = $request['id'] ?? null; 
+        $conversationId = $request['id'] ?? null;
 
         $ConvRepository = $entityManager->getRepository(Conversation::class);
-    
+
         if (!$conversationId) {
             $conversation = new Conversation();
         } else {
@@ -61,14 +61,14 @@ class AssistantController extends AbstractController
         $entityManager->persist($conversation);
         $entityManager->flush($conversation);
         $conversationId = $conversation->getId();
-    
+
         $mesage = new Message();
         $mesage->setAuthor(array_key_first($mesageUser));
         $mesage->setContent(reset($mesageUser));
         $mesage->setConversation($conversation);
         $entityManager->persist($mesage);
         $entityManager->flush($mesage);
-    
+
         $answer = $this->gptService->prompt('gpt-3.5-turbo', $request['system'], $request['conversation']);
 
         $messageAi = new Message();
@@ -90,10 +90,10 @@ class AssistantController extends AbstractController
         // request {id,system, conversation}
         $request = json_decode($request->getContent(), true);
         $mesageUser = end($request['conversation']);
-        $conversationId = $request['id'] ?? null; 
+        $conversationId = $request['id'] ?? null;
 
 
-    
+
         $answer = $this->gptService->prompt('gpt-3.5-turbo', $request['system'], $request['conversation']);
         print_r($answer);
 
