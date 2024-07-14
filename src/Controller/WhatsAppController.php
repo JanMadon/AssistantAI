@@ -18,22 +18,21 @@ class WhatsAppController extends AbstractController
         $this->whatsAppService = $whatsAppService;
     }
 
-    #[Route('/api/whatsApp/{number}', 'whatsApp')]
-    public function getMessages(Request $request, int $number): Response
+    #[Route('/api/whatsApp/session')]
+    public function getSession(Request $request): Response
     {
-        // sprawdz sesje:
-        
+        return new JsonResponse($this->whatsAppService->getSession());
+    }
 
-        // GET
-        $endpoint = '/api/messages';
+    #[Route('/api/whatsApp/session/start')]
+    public function sessionStart(): Response
+    {
+        return new JsonResponse($this->whatsAppService->startSession());
+    }
 
-        $data = [
-            'number' => $number,
-            'name' => 'zbyszek',
-            'lastname' => 'kowalski'
-        ];
-
-
-        return new JsonResponse($data);
+    #[Route('/api/whatsApp/session/stop')]
+    public function sessionStop(): Response
+    {
+        return new JsonResponse($this->whatsAppService->stopSession());
     }
 }
