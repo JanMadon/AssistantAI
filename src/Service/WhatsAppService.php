@@ -4,7 +4,11 @@ namespace App\Service;
 
 use App\Service\Interface\WhatsAppServiceInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class WhatsAppService implements WhatsAppServiceInterface
@@ -17,6 +21,34 @@ class WhatsAppService implements WhatsAppServiceInterface
     {
         $this->config = $config;
         $this->httpClient = $httpClient;
+    }
+
+    public function getQrCode()
+    {
+        try {
+            $response = $this->httpClient->request(
+                'GET',
+                'http://localhost:3000/api/default/auth/qr?format=image',
+                [
+                    'headers' => [
+                        'accept' => 'accept: image/png',
+                        //'accept' => 'application/json',
+                    ]
+                ]
+            );
+            $content = $response->getContent();
+        } catch (ClientExceptionInterface $e) {
+            $content = $e->getResponse()->getContent(false);
+        } catch (ServerExceptionInterface $e) {
+            $content = $e->getResponse()->getContent(false);
+        } catch (RedirectionExceptionInterface $e) {
+            $content = $e->getResponse()->getContent(false);
+        } catch (TransportExceptionInterface $e) {
+            dd($e->getMessage());
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+        }
+        return $content;
     }
 
     public function getSession()
@@ -101,6 +133,30 @@ class WhatsAppService implements WhatsAppServiceInterface
             );            
             $content = $response->getContent();
         }  catch (HttpExceptionInterface $e) { 
+            $content = $e->getResponse()->getContent(false);
+        }
+
+        return json_decode($content, true);
+    }
+
+    public function logoutSession()
+    {
+        $body = ['name' => 'default'];
+
+        try {
+            $response = $this->httpClient->request(
+                'POST',
+                'http://localhost:3000/api/sessions/logout',
+                [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Accept' => 'application/json'
+                    ],
+                    'body' => json_encode($body),
+                ]
+            );
+            $content = $response->getContent();
+        }  catch (HttpExceptionInterface $e) {
             $content = $e->getResponse()->getContent(false);
         }
 

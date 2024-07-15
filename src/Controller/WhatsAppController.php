@@ -18,6 +18,14 @@ class WhatsAppController extends AbstractController
         $this->whatsAppService = $whatsAppService;
     }
 
+    #[Route('/api/whatsApp/session/qr')]
+    public function getQR(Request $request): Response
+    {
+        $response = new Response($this->whatsAppService->getQrCode());
+        $response->headers->set('Content-Type', 'image/png');
+        return $response;
+    }
+
     #[Route('/api/whatsApp/session')]
     public function getSession(Request $request): Response
     {
