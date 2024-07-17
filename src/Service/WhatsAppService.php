@@ -23,32 +23,17 @@ class WhatsAppService implements WhatsAppServiceInterface
         $this->httpClient = $httpClient;
     }
 
+    // getChats pobiera tylko 1 widaomość z karzdego chatu
+    public function getChats()
+    {
+
+    }
+
     public function getQrCode()
     {
-        try {
-            $response = $this->httpClient->request(
-                'GET',
-                'http://localhost:3000/api/default/auth/qr?format=image',
-                [
-                    'headers' => [
-                        'accept' => 'accept: image/png',
-                        //'accept' => 'application/json',
-                    ]
-                ]
-            );
-            $content = $response->getContent();
-        } catch (ClientExceptionInterface $e) {
-            $content = $e->getResponse()->getContent(false);
-        } catch (ServerExceptionInterface $e) {
-            $content = $e->getResponse()->getContent(false);
-        } catch (RedirectionExceptionInterface $e) {
-            $content = $e->getResponse()->getContent(false);
-        } catch (TransportExceptionInterface $e) {
-            dd($e->getMessage());
-        } catch (\Exception $e) {
-            dd($e->getMessage());
-        }
-        return $content;
+        $header = ['accept' => 'accept: image/png'];
+        return $this->makeRequest('GET', 'default/auth/qr?format=image',$header);
+
     }
 
     public function getSession()
@@ -72,7 +57,7 @@ class WhatsAppService implements WhatsAppServiceInterface
         $body = [
             "name" => "default",
             "config" => [
-                "proxy" => null,
+               // "proxy" => null,
                 "noweb" => [
                     "store" => [
                         "enabled" => true,
@@ -81,17 +66,13 @@ class WhatsAppService implements WhatsAppServiceInterface
                 ],
                 "webhooks" => [
                     [
-                        "url" => "https://webhook.site/11111111-1111-1111-1111-11111111",
+                        "url" => 'http://localhost/webhook.php', //"https://localhost:8080/webhook/whatsApp/message",
                         "events" => [
                             "message",
-                            "session.status"
-                        ],
-                        "hmac" => null,
-                        "retries" => null,
-                        "customHeaders" => null
+                        ]
                     ]
                 ],
-                "debug" => false
+                "debug" => true
             ]
         ];        
 
@@ -161,5 +142,31 @@ class WhatsAppService implements WhatsAppServiceInterface
         }
 
         return json_decode($content, true);
+    }
+
+    private function makeRequest(string $method, string $endpoint, array $headers, ?array $body = null,)
+    {
+        try {
+            $response = $this->httpClient->request(
+                $method,
+                'http://localhost:3000/api/' . $endpoint,
+                [
+                    'headers' => $headers,
+                    'body' => json_encode($body),
+                ]
+            );
+            $content = $response->getContent();
+        } catch (ClientExceptionInterface $e) {
+            $content = $e->getResponse()->getContent(false);
+        } catch (ServerExceptionInterface $e) {
+            $content = $e->getResponse()->getContent(false);
+        } catch (RedirectionExceptionInterface $e) {
+            $content = $e->getResponse()->getContent(false);
+        } catch (TransportExceptionInterface $e) {
+            dd($e->getMessage());
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+        }
+        return $content;
     }
 }
