@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}index{% endblock %}
+
+{% block body %}
+    <div id="app">
+        <App /> 
+    </div>
+{% endblock %}
