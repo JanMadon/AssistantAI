@@ -3,18 +3,18 @@
 {% block title %}AI Assistant{% endblock %}
 
 {% block body %}
-<div class="row border h-75">
+<div class="row border p-3">
     <div class="col-md-4">
         <div class="form-group">
-            <label for="systemInput">System</label>
-            <textarea type="text" class="form-control" id="systemInput" placeholder="Enter system command or info"> </textarea>
+            <label for="systemInput">System:</label>
+            <textarea style="height: 500px;" class="form-control d-inline-block" id="systemInput" placeholder="Enter system command or info"> </textarea>
         </div>
     </div>
-    <div class="col-md-8">
+    <div class="col-md-8 d-flex flex-column justify-content-between">
         <div class="chat-box" id="chatBox">
-            <!-- Here the conversation will be displayed -->
+            <p>Conversation:</p>
         </div>
-        <div class="input-section">
+        <div class="input-section ">
             <div class="input-group">
                 <input type="text" class="form-control" id="userInput" placeholder="Type your message...">
                 <div class="input-group-append">
@@ -25,8 +25,30 @@
     </div>
 </div>
 
+    <style>
+        .chat-box {
+            height: 500px;
+            overflow-y: auto;
+        }
+
+        .conversation {
+            margin: 5px;
+            padding: 3px;
+            border: var(--bs-border-width) solid var(--bs-border-color);
+            border-radius: 3px;
+            transition: border;
+        }
+
+        .conversation:hover{
+            border: var(--bs-border-width) solid grey;
+            box-shadow: 1px 1px rgba(0, 0, 255, .2);
+        }
+
+    </style>
+
     {% block javascripts %}
         <script>   var dataUrl = "{{ path('assistent_prompt') }}"; </script>
-        <script src="{{ asset('js/assistent.js') }}"></script>
+        <script src="/js/assistent.js"></script>
     {% endblock %}
 {% endblock %}
+

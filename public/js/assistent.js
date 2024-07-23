@@ -8,12 +8,12 @@ async function sendMessage() {
     if (userInput.trim() !== '') {
         let chatBox = document.getElementById('chatBox');
         let userMessage = document.createElement('div');
-        userMessage.className = 'conversion'
+        userMessage.className = 'conversation'
         userMessage.textContent = 'User: ' + userInput;
         chatBox.appendChild(userMessage);
         
         let aiMessage = document.createElement('div');
-        aiMessage.className = 'conversion';
+        aiMessage.className = 'conversation';
         aiMessage.textContent = 'AI: ' + await getAIResponse(systemInput, conversation);
         chatBox.appendChild(aiMessage);
 
