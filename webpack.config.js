@@ -20,8 +20,8 @@ Encore
         config.useBuiltIns = 'usage';
         config.corejs = '3.23';
     })
-    .enableVueLoader(() => {}, { version: 3 })
-    .enablePostCssLoader();
-;
+    //.enableVueLoader(() => {}, { version: 3 })
+    //.enablePostCssLoader();
+    .enableSassLoader()
 
 module.exports = Encore.getWebpackConfig();
