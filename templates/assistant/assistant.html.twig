@@ -1,8 +1,22 @@
-{% extends 'layout/base.html.twig' %}
+{% extends 'assistant/assistant-bar.html.twig' %}
 
 {% block title %}AI Assistant{% endblock %}
 
-{% block body %}
+{% block content %}
+    <div class="container mt-5">
+        <!-- Dropdown Button -->
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Dropdown button
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="#">Action</a>
+                <a class="dropdown-item" href="#">Another action</a>
+                <a class="dropdown-item" href="#">Something else here</a>
+            </div>
+        </div>
+    </div>
+
 <div class="row border p-3">
     <div class="col-md-4">
         <div class="form-group">
