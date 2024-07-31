@@ -1,45 +1,44 @@
-{% extends 'assistant/assistant-bar.html.twig' %}
+{% extends 'layout/base.html.twig' %}
+
 
 {% block title %}AI Assistant{% endblock %}
 
-{% block content %}
-    <div class="container mt-5">
-        <!-- Dropdown Button -->
-        <div class="dropdown">
-            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Dropdown button
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="#">Action</a>
-                <a class="dropdown-item" href="#">Another action</a>
-                <a class="dropdown-item" href="#">Something else here</a>
-            </div>
-        </div>
-    </div>
-
-<div class="row border p-3">
-    <div class="col-md-4">
-        <div class="form-group">
-            <label for="systemInput">System:</label>
-            <textarea style="height: 500px;" class="form-control d-inline-block" id="systemInput" placeholder="Enter system command or info"> </textarea>
-        </div>
-    </div>
-    <div class="col-md-8 d-flex flex-column justify-content-between">
-        <div class="chat-box" id="chatBox">
-            <p>Conversation:</p>
-        </div>
-        <div class="input-section ">
-            <div class="input-group">
-                <input type="text" class="form-control" id="userInput" placeholder="Type your message...">
-                <div class="input-group-append">
-                    <button class="btn btn-primary" type="button" onclick="sendMessage()">Send</button>
+{% block body %}
+    <div class="container-fluid row">
+        <div class="row">
+            {% include 'assistant/assistant-bar.html.twig' %}
+            <div class="col">
+                <div class="form-group">
+                    <label for="systemInput">System:</label>
+                    <textarea style="height: 500px;" class="form-control d-inline-block" id="systemInput"
+                              placeholder="Enter system command or info"> </textarea>
                 </div>
             </div>
+
+            <div class="chat col d-flex flex-column justify-content-between">
+                <div class="chat-box" id="chatBox">
+                    <p>Conversation:</p>
+                </div>
+                <div class="input-section ">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="userInput" placeholder="Type your message...">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="button" onclick="sendMessage()">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
         </div>
     </div>
-</div>
 
     <style>
+
+        .chat {
+            height: 90vh;
+        }
+
         .chat-box {
             height: 500px;
             overflow-y: auto;
@@ -53,7 +52,7 @@
             transition: border;
         }
 
-        .conversation:hover{
+        .conversation:hover {
             border: var(--bs-border-width) solid grey;
             box-shadow: 1px 1px rgba(0, 0, 255, .2);
         }

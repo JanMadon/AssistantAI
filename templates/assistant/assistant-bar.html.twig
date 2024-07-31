@@ -1,43 +1,23 @@
-{% extends 'layout/base.html.twig' %}
 
-{% block title %}AI Assistant{% endblock %}
-
-{% block body %}
-
-    <aside id="sidebar">
-        <div class="d-flex">
-            <button class="toggle-btn" type="button">aaa
-                <i class="lni lni-grid-alt"></i>
+    <aside id="sidebar" class="main">
+        <div class="mr-0">
+            <button class="toggle-btn" type="button">
+                <p>MENU</p>
             </button>
-            <div class="sidebar-logo">
-                <a href="#">CodzSword</a>
-            </div>
         </div>
         <ul class="sidebar-nav">
-            <li class="sidebar-item">
-                <a href="#" class="sidebar-link">
-                    <i class="lni lni-user"></i>
-                    <span>Profile</span>
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="#" class="sidebar-link">
-                    <i class="lni lni-agenda"></i>
-                    <span>Task</span>
-                </a>
-            </li>
             <li class="sidebar-item">
                 <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
                    data-bs-target="#auth" aria-expanded="false" aria-controls="auth">
                     <i class="lni lni-protection"></i>
-                    <span>Auth</span>
+                    <span class="font-weight-bold">Template</span>
                 </a>
                 <ul id="auth" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                     <li class="sidebar-item">
-                        <a href="#" class="sidebar-link">Login</a>
+                        <p>opcja 1</p>
                     </li>
-                    <li class="sidebar-item">
-                        <a href="#" class="sidebar-link">Register</a>
+                    <li class="sidebar-item cursor-pointer">
+                        <p>opcja 2</p>
                     </li>
                 </ul>
             </li>
@@ -84,9 +64,6 @@
             </a>
         </div>
     </aside>
-    <div class="main p-3">
-        {% block content %}{% endblock %}
-    </div>
 
 
     <script>
@@ -107,33 +84,12 @@
             padding: 0;
         }
 
-        a {
-            text-decoration: none;
-        }
-
-        li {
-            list-style: none;
-        }
-
-        h1 {
-            font-weight: 600;
-            font-size: 1.5rem;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .wrapper {
-            display: flex;
-        }
-
         .main {
-            min-height: 100vh;
-            width: 100%;
+            border-top-right-radius: 10px;
+            height: 100vh;
             overflow: hidden;
             transition: all 0.35s ease-in-out;
-            background-color: #fafbfe;
+            background-color: #333;
         }
 
         #sidebar {
@@ -141,21 +97,22 @@
             min-width: 70px;
             z-index: 1000;
             transition: all .25s ease-in-out;
-            background-color: #0e2238;
+            background-color: #4c627b;
             display: flex;
             flex-direction: column;
         }
 
         #sidebar.expand {
-            width: 260px;
-            min-width: 260px;
+            width: 360px;
+            min-width: 360px;
         }
 
         .toggle-btn {
+            color: #FFF;
             background-color: transparent;
             cursor: pointer;
             border: 0;
-            padding: 1rem 1.5rem;
+            padding: 1rem 0rem;
         }
 
         .toggle-btn i {
@@ -242,7 +199,6 @@
         }
     </style>
 
-{% endblock %}
 
 
 
