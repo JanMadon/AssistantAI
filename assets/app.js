@@ -6,7 +6,12 @@
 
 // assets/app.js
 import 'bootstrap';
+// CSS
 import './styles/app.scss';
+import './styles/leftBar.css';
+
+
+//JS
 import './js/test.js';
 import {testJs} from "./js/test.js";
 
