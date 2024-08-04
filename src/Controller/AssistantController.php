@@ -39,7 +39,9 @@ class AssistantController extends AbstractController
 
         //dd($this->conversationRepository->getLastEntryId());
 
-        return $this->render('assistant.html.twig');
+        return $this->render('assistant/main.html.twig', [
+            'conversations' => $conversations,
+        ]);
     }
 
     #[Route('/api/assistant/prompt', 'assistent_prompt', methods:['POST'])]
