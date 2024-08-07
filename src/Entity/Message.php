@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\MessageRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Ignore;
 
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
 class Message
@@ -12,16 +14,20 @@ class Message
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups('conversation')]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups('conversation')]
     private ?string $author = null;
 
     #[ORM\ManyToOne(inversedBy: 'messages')]
     #[ORM\JoinColumn(nullable: true)]
+    #[Ignore]
     private ?Conversation $conversation = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups('conversation')]
     private ?string $content = null;
 
     public function getId(): ?int
