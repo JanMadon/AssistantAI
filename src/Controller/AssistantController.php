@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 
 class AssistantController extends AbstractController
@@ -22,25 +23,31 @@ class AssistantController extends AbstractController
 
     private GPTservice $gptService;
     private ConversationRepository $conversationRepository;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(GPTservice $gptService, ConversationRepository $conversationRepository)
+    public function __construct(
+        GPTservice $gptService,
+        ConversationRepository $conversationRepository,
+        EntityManagerInterface $entityManager)
     {
         $this->gptService = $gptService;
         $this->conversationRepository = $conversationRepository;
+        $this->entityManager = $entityManager;
     }
 
     #[Route('/assistant', 'assistant', methods: ['GET'])]
-    public function assistant(Request $request): Response
+    public function assistant(Request $request, SerializerInterface $serializer): Response
     {
         // $number = random_int(0, 100);
         // dd($this->getParameter('API_KEY_AIDEVS')); 
 
         // TODO: tezba bedzie pobrać z db ostatnią rozmwę;
-
-        //dd($this->conversationRepository->getLastEntryId());
+        $conversations = $this->conversationRepository->findAll();
+        $conversationsJson = $serializer->serialize($conversations, 'json', ['groups' => 'conversation']);
 
         return $this->render('assistant/main.html.twig', [
             'conversations' => $conversations,
+            'conversationsJson' => $conversationsJson,
         ]);
     }
 
