@@ -14,6 +14,8 @@ import './styles/leftBar.css';
 //JS
 import './js/test.js';
 import {testJs} from "./js/test.js";
+import axios from "axios";
 
 
 window.testJs = testJs;
+window.axios = axios;
