@@ -30,6 +30,7 @@
         "build": "encore production --progress"
     },
     "dependencies": {
+        "axios": "^1.7.3",
         "inflight": "^1.0.6",
         "vue": "^3.4.31"
     }

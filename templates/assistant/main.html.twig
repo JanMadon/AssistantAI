@@ -32,31 +32,6 @@
         </div>
     </div>
 
-    <style>
-
-        .chat {
-            height: 90vh;
-        }
-
-        .chat-box {
-            height: 500px;
-            overflow-y: auto;
-        }
-
-        .conversation {
-            margin: 5px;
-            padding: 3px;
-            border: var(--bs-border-width) solid var(--bs-border-color);
-            border-radius: 3px;
-            transition: border;
-        }
-
-        .conversation:hover {
-            border: var(--bs-border-width) solid grey;
-            box-shadow: 1px 1px rgba(0, 0, 255, .2);
-        }
-
-    </style>
 
     {% block javascripts %}
         <script>   var dataUrl = "{{ path('assistent_prompt') }}"; </script>
