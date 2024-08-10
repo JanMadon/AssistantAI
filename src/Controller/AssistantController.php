@@ -8,6 +8,7 @@ use App\Repository\ConversationRepository;
 use App\Service\GPTservice;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use phpDocumentor\Reflection\Type;
 use PhpParser\Node\Stmt\TryCatch;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -38,10 +39,6 @@ class AssistantController extends AbstractController
     #[Route('/assistant', 'assistant', methods: ['GET'])]
     public function assistant(Request $request, SerializerInterface $serializer): Response
     {
-        // $number = random_int(0, 100);
-        // dd($this->getParameter('API_KEY_AIDEVS')); 
-
-        // TODO: tezba bedzie pobrać z db ostatnią rozmwę;
         $conversations = $this->conversationRepository->findAll();
         $conversationsJson = $serializer->serialize($conversations, 'json', ['groups' => 'conversation']);
 
@@ -52,14 +49,14 @@ class AssistantController extends AbstractController
     }
 
     #[Route('/api/assistant/prompt', 'assistent_prompt', methods:['POST'])]
-    public function assistantConversation(Request $request, EntityManagerInterface $entityManager): Response
+    public function assistantConversation(Request $request): Response
     {
         // request {id,system, conversation}
         $request = json_decode($request->getContent(), true);
-        $mesageUser = end($request['conversation']);
+        $messageUser = end($request['conversation']);
         $conversationId = $request['id'] ?? null;
 
-        $ConvRepository = $entityManager->getRepository(Conversation::class);
+        $ConvRepository = $this->entityManager->getRepository(Conversation::class);
 
         if (!$conversationId) {
             $conversation = new Conversation();
@@ -67,16 +64,16 @@ class AssistantController extends AbstractController
             $conversation =  $ConvRepository->find($conversationId);
         }
         $conversation->setDescription($request['system']);
-        $entityManager->persist($conversation);
-        $entityManager->flush($conversation);
+        $this->entityManager->persist($conversation);
+        $this->entityManager->flush($conversation);
         $conversationId = $conversation->getId();
 
-        $mesage = new Message();
-        $mesage->setAuthor(array_key_first($mesageUser));
-        $mesage->setContent(reset($mesageUser));
-        $mesage->setConversation($conversation);
-        $entityManager->persist($mesage);
-        $entityManager->flush($mesage);
+        $message = new Message();
+        $message->setAuthor(array_key_first($messageUser));
+        $message->setContent(reset($messageUser));
+        $message->setConversation($conversation);
+        $this->entityManager->persist($message);
+        $this->entityManager->flush($message);
 
         $answer = $this->gptService->prompt('gpt-3.5-turbo', $request['system'], $request['conversation']);
 
@@ -84,8 +81,8 @@ class AssistantController extends AbstractController
         $messageAi->setAuthor('AI');
         $messageAi->setContent($answer);
         $messageAi->setConversation($conversation);
-        $entityManager->persist($messageAi);
-        $entityManager->flush($messageAi);
+        $this->entityManager->persist($messageAi);
+        $this->entityManager->flush($messageAi);
 
         return new JsonResponse([
             'answer' => $answer,
@@ -98,7 +95,7 @@ class AssistantController extends AbstractController
     {
         // request {id,system, conversation}
         $request = json_decode($request->getContent(), true);
-        $mesageUser = end($request['conversation']);
+        $messageUser = end($request['conversation']);
         $conversationId = $request['id'] ?? null;
 
 
