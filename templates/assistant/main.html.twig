@@ -9,7 +9,7 @@
             {% include 'assistant/assistant-bar.html.twig' %}
             <div class="col">
                 <div class="form-group">
-                    <label for="systemInput">System:</label>
+                    <h5 for="systemInput">System</h5>
                     <textarea style="height: 500px;" class="form-control d-inline-block" id="systemInput"
                               placeholder="Enter system command or info"> </textarea>
                 </div>
@@ -17,13 +17,15 @@
 
             <div class="chat col d-flex flex-column justify-content-between">
                 <div class="chat-box" id="chatBox">
-                    <p>Conversation:</p>
+                    <h5>Conversation</h5>
                 </div>
                 <div class="input-section ">
                     <div class="input-group">
                         <input type="text" class="form-control" id="userInput" placeholder="Type your message...">
                         <div class="input-group-append">
-                            <button class="btn btn-primary" type="button" onclick="sendMessage()">Send</button>
+                            <button class="btn btn-primary" type="button" onclick="sendMessage()">
+                                Send
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -31,11 +33,106 @@
 
         </div>
     </div>
+{% endblock %}
 
 
-    {% block javascripts %}
-        <script>   var dataUrl = "{{ path('assistent_prompt') }}"; </script>
-        <script src="/js/assistent.js"></script>
-    {% endblock %}
+{% block javascripts %}
+    <script>
+        let systemInput = document.getElementById('systemInput')
+        let userInput = document.getElementById('userInput')
+        let conversation = document.getElementById('chatBox')
+        let conversation_id = null;
+
+        function fillChatBox(selectConv) {
+            //clear
+            let showingMessages = conversation.querySelectorAll('.conversation')
+            for(let message of showingMessages){
+                message.remove()
+            }
+            systemInput.value = ''
+            userInput.value = ''
+
+            // fill
+            console.log(selectConv)
+            conversation_id = selectConv.id
+            systemInput.value = selectConv.description
+            selectConv.messages.forEach(message => {
+                let messageField = document.createElement('div');
+                messageField.className = 'conversation'
+                messageField.textContent = message.author+ ': ' + message.content;
+                conversation.appendChild(messageField);
+            })
+
+
+        }
+
+        async function sendMessage() {
+            if (userInput.value.trim() !== '') {
+                let chatBox = document.getElementById('chatBox');
+                let userMessage = document.createElement('div');
+                userMessage.className = 'conversation'
+                userMessage.textContent = 'User: ' + userInput.value;
+                chatBox.appendChild(userMessage);
+
+                let aiMessage = document.createElement('div');
+                aiMessage.className = 'conversation';
+                aiMessage.innerHTML = 'AI: ' + await getAIResponse(systemInput.value, chatBox);
+                chatBox.appendChild(aiMessage);
+
+                document.getElementById('userInput').value = '';
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }
+
+        async function getAIResponse(system, chatBox) {
+            let messages = chatBox.getElementsByClassName('conversation')
+            console.log(messages);
+            const conversation = [];
+
+            for (let message of messages) {
+                message = (message.textContent).split(':');
+                let $site = message.shift();
+
+                if ($site === 'User') {
+                    conversation.push({'User': message[0]})
+                } else if ($site === 'AI') {
+                    conversation.push({'AI': message[0]})
+                } else {
+                    console.error($site)
+                }
+            }
+            return await askChat(system, conversation)
+        }
+
+        async function askChat(system, conversation) {
+            const data = {
+                'id': conversation_id,
+                'system': system,
+                'conversation': conversation
+            }
+            console.log(JSON.stringify(data))
+
+            try {
+                const response = await axios.post(dataUrl, data)
+                conversation_id = response.data.id
+                return response.data.answer
+
+            } catch (error) {
+                console.error(error)
+                return null
+            }
+        }
+
+        function markdownConverter($message) {
+            //import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
+            // document.getElementById('content').innerHTML =
+            //     marked.parse('# Marked in the browser\n\nRendered by **marked**.');
+            return marked.parse($message)
+        }
+
+
+    </script>
+
+    <script>   var dataUrl = "{{ path('assistent_prompt') }}"; </script>
 {% endblock %}
 
