@@ -11,11 +11,19 @@
     margin: 5px;
     padding: 3px;
     border: var(--bs-border-width) solid var(--bs-border-color);
-    border-radius: 3px;
+    border-radius: 10px;
     transition: border;
 }
 
 .conversation:hover {
     border: var(--bs-border-width) solid grey;
     box-shadow: 1px 1px rgba(0, 0, 255, .2);
+}
+
+.user {
+    background-color: #a1dae7;
+}
+
+.ai {
+    background-color: rgba(181, 244, 186, 0.88);
 }

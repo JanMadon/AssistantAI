@@ -41,7 +41,6 @@ class AssistantController extends AbstractController
     {
         $conversations = $this->conversationRepository->findAll();
         $conversationsJson = $serializer->serialize($conversations, 'json', ['groups' => 'conversation']);
-
         return $this->render('assistant/main.html.twig', [
             'conversations' => $conversations,
             'conversationsJson' => $conversationsJson,
@@ -60,6 +59,7 @@ class AssistantController extends AbstractController
 
         if (!$conversationId) {
             $conversation = new Conversation();
+            $conversation->setName(reset($messageUser));
         } else {
             $conversation =  $ConvRepository->find($conversationId);
         }

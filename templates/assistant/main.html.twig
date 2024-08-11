@@ -55,11 +55,11 @@
             // fill
             console.log(selectConv)
             conversation_id = selectConv.id
-            systemInput.value = selectConv.system
+            systemInput.value = selectConv.system_field
             selectConv.messages.forEach(message => {
                 let messageField = document.createElement('div');
-                messageField.className = 'conversation'
-                messageField.innerHTML = message.author+ ': ' + message.content;
+                messageField.className = 'conversation ' + message.author.toLowerCase()
+                messageField.innerHTML = message.author + ': ' + message.content;
                 conversation.appendChild(messageField);
             })
 
@@ -70,12 +70,12 @@
             if (userInput.value.trim() !== '') {
                 let chatBox = document.getElementById('chatBox');
                 let userMessage = document.createElement('div');
-                userMessage.className = 'conversation'
+                userMessage.className = 'conversation user'
                 userMessage.textContent = 'User: ' + userInput.value;
                 chatBox.appendChild(userMessage);
 
                 let aiMessage = document.createElement('div');
-                aiMessage.className = 'conversation';
+                aiMessage.className = 'conversation ai';
                 aiMessage.innerHTML = 'AI: ' + await getAIResponse(systemInput.value, chatBox);
                 chatBox.appendChild(aiMessage);
 

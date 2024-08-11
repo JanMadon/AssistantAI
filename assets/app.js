@@ -9,6 +9,7 @@ import 'bootstrap';
 // CSS
 import './styles/app.scss';
 import './styles/leftBar.css';
+import './styles/assistantChat.css';
 
 
 //JS
