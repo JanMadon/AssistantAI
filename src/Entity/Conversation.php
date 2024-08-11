@@ -25,7 +25,7 @@ class Conversation
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups('conversation')]
-    private ?string $description = null;
+    private ?string $system_field = null;
 
     /**
      * @var Collection<int, Message>
@@ -64,14 +64,14 @@ class Conversation
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getSystemField(): ?string
     {
-        return $this->description;
+        return $this->system_field;
     }
 
-    public function setDescription(?string $description): static
+    public function setSystemField(?string $description): static
     {
-        $this->description = $description;
+        $this->system_field = $description;
 
         return $this;
     }

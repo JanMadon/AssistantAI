@@ -63,7 +63,7 @@ class AssistantController extends AbstractController
         } else {
             $conversation =  $ConvRepository->find($conversationId);
         }
-        $conversation->setDescription($request['system']);
+        $conversation->setSystemField($request['system']);
         $this->entityManager->persist($conversation);
         $this->entityManager->flush($conversation);
         $conversationId = $conversation->getId();
