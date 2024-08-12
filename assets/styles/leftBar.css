@@ -141,6 +141,10 @@ a.sidebar-link:hover {
     cursor: pointer;
 }
 
+.vh-50 {
+    height: 50vh;
+}
+
 #last-conversation {
     max-height: 40vh;
     overflow-y: auto;

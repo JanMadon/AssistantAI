@@ -42,7 +42,49 @@
 
 <div class="d-none" id="conversations-data" data-conversations="{{ conversationsJson }}"></div>
 
+<!-- Modal add template-->
+<div class="modal fade modal-lg" id="templateModal" tabindex="-1" role="dialog" aria-labelledby="templateModal"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <form id="template_form">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <label for="template-name">name</label>
+                    <input type="text" class="form-control" id="template-name" name="name" placeholder="Enter name">
+                </div>
+                <div class="modal-body">
+                    <label for="template-content">Content</label>
+                    <textarea class="form-control vh-50" id="template-content" name="content"  rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 <script>
+    // set new template
+    document.addEventListener("DOMContentLoaded", () => {
+        const templateForm = document.getElementById('template_form');
+        console.log(templateForm)
+        templateForm.addEventListener('submit', e => {
+            e.preventDefault()
+            const templateData = new FormData(templateForm)
+            console.log(templateData);
+
+            axios.post('https://localhost:8000/api/assistant/template', templateData)
+                .then(function (response) {
+                    console.log('Formularz wysłany pomyślnie:', response.data);
+                })
+                .catch(function (error) {
+                    console.error('Błąd przy wysyłaniu formularza:', error);
+                });
+        })
+    })
 
     document.addEventListener("DOMContentLoaded", () => {
         const chatBox = document.getElementById('chatBox');
