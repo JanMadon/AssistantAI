@@ -11,11 +11,15 @@
                 Template messages
             </h6>
             <ul id="template_messages" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-                {% for conversation in conversations %}
-                    <li class="sidebar-item cursor-pointer">
-                        <p>{{ conversation.id }} {{ conversation.name }}!!!</p>
+                {% for template in templates %}
+                    <li id="{{ template.id }}" class="sidebar-item cursor-pointer">
+                        <p>{{ template.id }} {{ template.name }} </p>
+                        <p hidden>{{ template.content }}</p>
                     </li>
                 {% endfor %}
+                <li class="sidebar-item cursor-pointer" data-bs-toggle="modal" data-bs-target="#templateModal">
+                    ADDED TEMPLATE
+                </li>
             </ul>
         </li>
         <li class="sidebar-submenu">
@@ -40,13 +44,14 @@
     </div>
 </aside>
 
+<!-- Przekazanie z Twinga do js-->
 <div class="d-none" id="conversations-data" data-conversations="{{ conversationsJson }}"></div>
 
 <!-- Modal add template-->
-<div class="modal fade modal-lg" id="templateModal" tabindex="-1" role="dialog" aria-labelledby="templateModal"
+<div class="modal fade" id="templateModal" tabindex="-1" role="dialog" aria-labelledby="templateModal"
      aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <form id="template_form">
+    <div class="modal-dialog modal-dialog-centered modal-xl flex justify-content-center" role="document">
+        <form id="template_form" class="w-50">
             <div class="modal-content">
                 <div class="modal-header">
                     <label for="template-name">name</label>
@@ -58,7 +63,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save changes</button>
                 </div>
             </div>
         </form>
@@ -87,8 +92,12 @@
     })
 
     document.addEventListener("DOMContentLoaded", () => {
-        const chatBox = document.getElementById('chatBox');
+        const selectedTemplate = document.getElementById('template_messages')
         const conversationList = document.getElementById('last-conversation')
+
+        selectedTemplate.addEventListener('click', e => {
+            fillSystemField(e.target.nextElementSibling.innerText);// z assistant/main.html.twig
+         })
 
         conversationList.addEventListener('click', e => {
             const conversation = getConversation(+e.target.parentElement.id);

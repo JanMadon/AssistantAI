@@ -43,6 +43,14 @@
         let conversation = document.getElementById('chatBox')
         let conversation_id = null;
 
+        fillSystemField = (content) => {
+            let showingMessages = conversation.querySelectorAll('.conversation')
+            for(let message of showingMessages){
+                message.remove()
+            }
+            systemInput.value = content
+        }
+
         function fillChatBox(selectConv) {
             //clear
             let showingMessages = conversation.querySelectorAll('.conversation')

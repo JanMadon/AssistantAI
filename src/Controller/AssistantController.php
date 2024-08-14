@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Conversation;
 use App\Entity\Message;
+use App\Entity\Template;
 use App\Repository\ConversationRepository;
+use App\Repository\TemplateRepository;
 use App\Service\GPTservice;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -29,10 +31,12 @@ class AssistantController extends AbstractController
     public function __construct(
         GPTservice $gptService,
         ConversationRepository $conversationRepository,
+        TemplateRepository $templateRepository,
         EntityManagerInterface $entityManager)
     {
         $this->gptService = $gptService;
         $this->conversationRepository = $conversationRepository;
+        $this->templateRepository = $templateRepository;
         $this->entityManager = $entityManager;
     }
 
@@ -41,9 +45,11 @@ class AssistantController extends AbstractController
     {
         $conversations = $this->conversationRepository->findAll();
         $conversationsJson = $serializer->serialize($conversations, 'json', ['groups' => 'conversation']);
+        $templates = $this->templateRepository->findAll();
         return $this->render('assistant/main.html.twig', [
             'conversations' => $conversations,
             'conversationsJson' => $conversationsJson,
+            'templates' => $templates
         ]);
     }
 
@@ -88,6 +94,18 @@ class AssistantController extends AbstractController
             'answer' => $answer,
             'id' => $conversationId,
         ], 200);
+    }
+
+    #[Route('/api/assistant/template', 'template_save', methods:['POST'])]
+    public function saveTemplate(Request $request): Response
+    {
+        $template = new Template();
+        $template->setName($request->get('name'));
+        $template->setContent($request->get('content'));
+        $this->entityManager->persist($template);
+        $this->entityManager->flush();
+
+       return new JsonResponse('ok');
     }
 
     #[Route('/api/assistant/test', 'assistent_testt')]
