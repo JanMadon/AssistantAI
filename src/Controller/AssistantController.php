@@ -43,9 +43,9 @@ class AssistantController extends AbstractController
     #[Route('/assistant', 'assistant', methods: ['GET'])]
     public function assistant(Request $request, SerializerInterface $serializer): Response
     {
-        $conversations = $this->conversationRepository->findAll();
+        $conversations = $this->conversationRepository->findBy([], ['id' => 'DESC']);
         $conversationsJson = $serializer->serialize($conversations, 'json', ['groups' => 'conversation']);
-        $templates = $this->templateRepository->findAll();
+        $templates = $this->templateRepository->findBy([], ['id' => 'DESC']);;
         return $this->render('assistant/main.html.twig', [
             'conversations' => $conversations,
             'conversationsJson' => $conversationsJson,
