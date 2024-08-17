@@ -3,7 +3,7 @@
 }
 
 .chat-box {
-    height: 500px;
+    height: 800px;
     overflow-y: auto;
 }
 
@@ -21,9 +21,11 @@
 }
 
 .user {
+    color: black;
     background-color: #a1dae7;
 }
 
 .ai {
+    color: black;
     background-color: rgba(181, 244, 186, 0.88);
 }

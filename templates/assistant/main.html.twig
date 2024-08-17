@@ -121,7 +121,7 @@
             console.log(JSON.stringify(data))
 
             try {
-                const response = await axios.post(dataUrl, data)
+                const response = await axios.post("{{ path('assistent_prompt') }}", data)
                 conversation_id = response.data.id
                 return response.data.answer
 
@@ -130,17 +130,6 @@
                 return null
             }
         }
-
-        function markdownConverter($message) {
-            //import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
-            // document.getElementById('content').innerHTML =
-            //     marked.parse('# Marked in the browser\n\nRendered by **marked**.');
-            return marked.parse($message)
-        }
-
-
     </script>
-
-    <script>   var dataUrl = "{{ path('assistent_prompt') }}"; </script>
 {% endblock %}
 

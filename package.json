@@ -15,8 +15,6 @@
         "regenerator-runtime": "^0.13.9",
         "sass": "^1.77.8",
         "sass-loader": "^14.2.1",
-        "tailwindcss": "^3.4.4",
-        "vue-loader": "^17.0.0",
         "webpack": "^5.93.0",
         "webpack-cli": "^4.10.0",
         "webpack-notifier": "^1.15.0"
@@ -31,7 +29,6 @@
     },
     "dependencies": {
         "axios": "^1.7.3",
-        "inflight": "^1.0.6",
-        "vue": "^3.4.31"
+        "inflight": "^1.0.6"
     }
 }

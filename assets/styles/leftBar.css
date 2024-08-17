@@ -8,6 +8,7 @@
 }
 
 .main {
+    color: black;
     border-top-right-radius: 10px;
     height: 100vh;
     overflow: hidden;
@@ -31,30 +32,15 @@
 }
 
 .toggle-btn {
-    color: #FFF;
     background-color: transparent;
     cursor: pointer;
     border: 0;
     padding: 1rem 0rem;
 }
 
-.toggle-btn i {
-    font-size: 1.5rem;
-    color: #FFF;
-}
-
-.sidebar-logo {
-    margin: auto 0;
-}
-
-.sidebar-logo a {
-    color: #FFF;
-    font-size: 1.15rem;
-    font-weight: 600;
-}
-
 #sidebar:not(.expand) .sidebar-logo,
-#sidebar:not(.expand) h6.sidebar-link {
+#sidebar:not(.expand) h6.sidebar-link,
+#sidebar:not(.expand) ul.sidebar-dropdown{
     display: none;
 }
 
