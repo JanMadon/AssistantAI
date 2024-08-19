@@ -31,3 +31,14 @@
 npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
+/.idea/.gitignore
+/.idea/AssistantAI.iml
+/.idea/phpspec.xml
+/.idea/dataSources.xml
+/.idea/deployment.xml
+/.idea/modules.xml
+/.idea/php.xml
+/.idea/phpunit.xml
+/.idea/sshConfigs.xml
+/.idea/vcs.xml
+/.idea/webServers.xml
