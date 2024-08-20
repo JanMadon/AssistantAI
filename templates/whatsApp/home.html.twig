@@ -1,0 +1,44 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block body %}
+<div class="row m-5">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Session get QR code</h5>
+                <p class="card-text">Get QR code and scan to log in.</p>
+                <a href="#" class="btn btn-primary">getQR</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Session </h5>
+                <p class="card-text">Get session info.</p>
+                <a href="#" class="btn btn-primary">getSession</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Session start</h5>
+                <p class="card-text">starts session.</p>
+                <a href="#" class="btn btn-primary">Start session</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Session stop</h5>
+                <p class="card-text">stops session.</p>
+                <a href="#" class="btn btn-primary">stopSession</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
