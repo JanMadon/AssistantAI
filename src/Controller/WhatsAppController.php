@@ -18,7 +18,13 @@ class WhatsAppController extends AbstractController
         $this->whatsAppService = $whatsAppService;
     }
 
-    #[Route('/api/whatsApp/session/qr')]
+    #[Route('/whatsApp/home', name: 'whatsApp.home', methods: ['GET'])]
+    public function home(Request $request): Response
+    {
+        return $this->render('whatsApp/home.html.twig');
+    }
+
+    #[Route('/api/whatsApp/session/qr', name: 'whatsApp.session.qr', methods: ['GET'])]
     public function getQR(Request $request): Response
     {
         $response = new Response($this->whatsAppService->getQrCode());
@@ -26,19 +32,19 @@ class WhatsAppController extends AbstractController
         return $response;
     }
 
-    #[Route('/api/whatsApp/session')]
+    #[Route('/api/whatsApp/session', name: 'whatsApp.session.get', methods: ['GET'])]
     public function getSession(Request $request): Response
     {
         return new JsonResponse($this->whatsAppService->getSession());
     }
 
-    #[Route('/api/whatsApp/session/start')]
+    #[Route('/api/whatsApp/session/start', name: 'whatsApp.session.start', methods: ['GET'])]
     public function sessionStart(): Response
     {
         return new JsonResponse($this->whatsAppService->startSession());
     }
 
-    #[Route('/api/whatsApp/session/stop')]
+    #[Route('/api/whatsApp/session/stop', name: 'whatsApp.session.stop', methods: ['GET'])]
     public function sessionStop(): Response
     {
         return new JsonResponse($this->whatsAppService->stopSession());
