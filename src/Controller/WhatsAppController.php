@@ -21,7 +21,29 @@ class WhatsAppController extends AbstractController
     #[Route('/whatsApp/home', name: 'whatsApp.home', methods: ['GET'])]
     public function home(Request $request): Response
     {
-        return $this->render('whatsApp/home.html.twig');
+        $action = $request->query->get('action');
+        switch ($action) {
+            case 'start':
+                $startSession = $this->whatsAppService->startSession();
+                break;
+            case 'get_qrCode':
+                $qrCode = $this->whatsAppService->getQrCode();
+                break;
+            case 'get_session':
+                $session = $this->whatsAppService->getSession();
+                break;
+            case 'stop':
+                $stopSession = $this->whatsAppService->stopSession();
+                break;
+        }
+        dd($stopSession);
+
+        return $this->render('whatsApp/home.html.twig',[
+            'session' => $session ?? null,
+            'qrCode' => $qrCode ?? null,
+            'startSession' => $startSession ?? null,
+            'stopSession' => $stopSession ?? null,
+        ]);
     }
 
     #[Route('/api/whatsApp/session/qr', name: 'whatsApp.session.qr', methods: ['GET'])]
