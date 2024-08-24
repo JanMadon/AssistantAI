@@ -22,37 +22,43 @@ class WhatsAppController extends AbstractController
     public function home(Request $request): Response
     {
         $action = $request->query->get('action');
-        switch ($action) {
-            case 'start':
-                $startSession = $this->whatsAppService->startSession();
-                break;
-            case 'get_qrCode':
-                $qrCode = $this->whatsAppService->getQrCode();
-                break;
-            //case 'get_session': // todo info always get below
-                //$session = $this->whatsAppService->getSession();
-                //break;
-            case 'stop':
-                $stopSession = $this->whatsAppService->stopSession() === null ?
-                    'stopped': $this->whatsAppService->stopSession();
-                break;
+
+        $session = $this->whatsAppService->getSession()[0] ?? null; // $session->name
+
+        if($session){
+            switch ($action) {
+                // SESSION
+                case 'start':
+                    $startSession = $this->whatsAppService->startSession();
+                    break;
+                case 'get_qrCode':
+                    $qrCode = $this->whatsAppService->getQrCode();
+                    break;
+                case 'stop':
+                    $stopSession = $this->whatsAppService->stopSession() === null ?
+                        'stopped': $this->whatsAppService->stopSession();
+                    break;
+
+                // CHATS
+                case 'get_chats':
+                    $chats = $this->whatsAppService->getChats($session['name']);
+                    break;
+            }
         }
-        $session = $this->whatsAppService->getSession();
-
-
 
         return $this->render('whatsApp/home.html.twig',[
-            'session' => $session[0] ?? null,
+            'session' => $session ?? null,
             'qrCode' => $qrCode ?? null,
             'startSession' => $startSession ?? null,
             'stopSession' => $stopSession ?? null,
+            'chats' => $chats ?? null
         ]);
     }
 
 
 
 
-    // controllers for api returns JSON:
+    // {session} controllers for api returns JSON:
     #[Route('/api/whatsApp/session/qr', name: 'whatsApp.session.qr', methods: ['GET'])]
     public function getQR(Request $request): Response
     {

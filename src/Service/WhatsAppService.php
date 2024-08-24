@@ -24,9 +24,20 @@ class WhatsAppService implements WhatsAppServiceInterface
     }
 
     // getChats pobiera tylko 1 widaomość z karzdego chatu
-    public function getChats()
+    public function getChats($sessionName)
     {
+        try{
+            $response = $this->httpClient->request(
+                'GET',
+                'http://localhost:3000/api/' . $sessionName . '/chats',
+            );
+            $content = $response->getContent();
 
+        } catch(HttpExceptionInterface $e) {
+            $content = $e->getResponse()->getContent();
+        }
+
+        return json_decode($content, true);
     }
 
     public function getQrCode()
