@@ -3,42 +3,82 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block body %}
-<div class="row m-5">
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Session get QR code</h5>
-                <p class="card-text">Get QR code and scan to log in.</p>
-                <a href="#" class="btn btn-primary">getQR</a>
+    <div class="border-top border-bottom">
+        <div class="row m-5">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Session start</h5>
+                        <p class="card-text">starts session.</p>
+                        <a href="?action=start" class="btn btn-primary">Start session</a>
+                    </div>
+                    {% if  startSession.name is defined %}
+                        <div class="card-body">
+                            <p class="card-text">name: <b>{{ startSession.name ?? "-" }}</b></p>
+                            <p class="card-text">status: <b>{{ startSession.status ?? "-" }}</b></p>
+                            {#                        <p class="card-text">config(arr): <b>{{ startSession.error ?? "-" }}</b></p> #}
+                        </div>
+                    {% elseif  startSession.error is defined %}
+                        <div class="card-body">
+                            <p class="card-text">statusCode: <b>{{ startSession.statusCode ?? "-" }}</b></p>
+                            <p class="card-text">message: <b>{{ startSession.message ?? "-" }}</b></p>
+                            <p class="card-text">error: <b>{{ startSession.error ?? "-" }}</b></p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Session get QR code</h5>
+                        <p class="card-text">Get QR code and scan to log in.</p>
+                        <a href="?action=get_qrCode" class="btn btn-primary">getQR</a>
+                    </div>
+                    <div class="card-body overflow-hidden">
+                        {% if qrCode %}
+                            <img class="img-fluid" src="data:image/jpeg;base64;,{{ qrCode }}" alt="qr code"/>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Session INFO</h5>
+                        <p class="card-text">Get session info.</p>
+                        <a href="?action=get_session" class="btn btn-primary">getSession</a>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">name: <b>{{ session.name ?? "-" }}</b></p>
+                        <p class="card-text">status: <b>{{ session.status ?? "-" }}</b></p>
+                        <p class="card-text">me: <b>{{ session.me ?? 'null' }}</b></p>
+                        <p class="card-text">config: <b>arr</b></p>
+                        <p class="card-text">engine: <b>arr</b></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Session stop</h5>
+                        <p class="card-text">stops session.</p>
+                        <a href="?action=stop" class="btn btn-primary">stopSession</a>
+                    </div>
+                    <div>
+                        <p class="card-text">Is it ok?:
+                            <b>
+                                {{ stopSession == 'stopped' ? stopSession : '' }}
+                            </b>
+                        </p>
+                        <p class="card-text">statusCode: <b>{{ stopSession.statusCode ?? "-" }}</b></p>
+                        <p class="card-text">message: <b>{{ stopSession.message ?? "-" }}</b></p>
+                        <p class="card-text">error: <b>{{ stopSession.error ?? "-" }}</b></p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Session </h5>
-                <p class="card-text">Get session info.</p>
-                <a href="#" class="btn btn-primary">getSession</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Session start</h5>
-                <p class="card-text">starts session.</p>
-                <a href="#" class="btn btn-primary">Start session</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Session stop</h5>
-                <p class="card-text">stops session.</p>
-                <a href="#" class="btn btn-primary">stopSession</a>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock %}

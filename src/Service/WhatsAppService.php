@@ -32,8 +32,8 @@ class WhatsAppService implements WhatsAppServiceInterface
     public function getQrCode()
     {
         $header = ['accept' => 'accept: image/png'];
-        return $this->makeRequest('GET', 'default/auth/qr?format=image',$header);
-
+        $image = $this->makeRequest('GET', 'default/auth/qr?format=image', $header);
+        return base64_encode($image);
     }
 
     public function getSession()

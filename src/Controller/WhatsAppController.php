@@ -29,23 +29,30 @@ class WhatsAppController extends AbstractController
             case 'get_qrCode':
                 $qrCode = $this->whatsAppService->getQrCode();
                 break;
-            case 'get_session':
-                $session = $this->whatsAppService->getSession();
-                break;
+            //case 'get_session': // todo info always get below
+                //$session = $this->whatsAppService->getSession();
+                //break;
             case 'stop':
-                $stopSession = $this->whatsAppService->stopSession();
+                $stopSession = $this->whatsAppService->stopSession() === null ?
+                    'stopped': $this->whatsAppService->stopSession();
                 break;
         }
-        dd($stopSession);
+        $session = $this->whatsAppService->getSession();
+
+
 
         return $this->render('whatsApp/home.html.twig',[
-            'session' => $session ?? null,
+            'session' => $session[0] ?? null,
             'qrCode' => $qrCode ?? null,
             'startSession' => $startSession ?? null,
             'stopSession' => $stopSession ?? null,
         ]);
     }
 
+
+
+
+    // controllers for api returns JSON:
     #[Route('/api/whatsApp/session/qr', name: 'whatsApp.session.qr', methods: ['GET'])]
     public function getQR(Request $request): Response
     {
