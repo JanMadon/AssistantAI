@@ -53,7 +53,7 @@
                     <div class="card-body">
                         <p class="card-text">name: <b>{{ session.name ?? "-" }}</b></p>
                         <p class="card-text">status: <b>{{ session.status ?? "-" }}</b></p>
-                        <p class="card-text">me: <b>{{ session.me ?? 'null' }}</b></p>
+                        <p class="card-text">me: <b>{{ session.me ? session.me|join(', ') :'empty' }}</b></p>
                         <p class="card-text">config: <b>arr</b></p>
                         <p class="card-text">engine: <b>arr</b></p>
                     </div>
@@ -81,4 +81,36 @@
             </div>
         </div>
     </div>
+    {% if session.me %}
+        <div class="border-top border-bottom">
+            <div class="row m-1">
+                <div>
+                    <div class="card">
+                        <div class="">
+                            <a href="?action=get_chats" class="btn btn-primary">Get chats</a>
+                            <a href="?action=get_contacts" class="btn btn-primary">Get contacts</a>
+
+                        </div>
+                        {% if chats %}
+                        <div class="my-2">
+                            <h6>Your hats: </h6>
+                            {% for chat in chats %}
+                            <a href="?action=#" class="btn btn-secondary">{{ chat.name }}</a>
+                            {% endfor %}
+                        </div>
+                        {% elseif contacts %}
+                            <div class="my-2">
+                                <h6>Your Contacts: </h6>
+                                {% for contact in contacts %}
+                                    <a href="?action=#" class="btn btn-secondary">{{ contact.name ?? contact.pushname}}</a>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    {% endif %}
+
 {% endblock %}

@@ -22,6 +22,23 @@ class WhatsAppService implements WhatsAppServiceInterface
         $this->config = $config;
         $this->httpClient = $httpClient;
     }
+    
+    public function getContacts($name)
+    {
+        try{
+            $response = $this->httpClient->request(
+                'GET',
+                'http://localhost:3000/api/contacts/all?session='. $name
+            );
+            $content = $response->getContent();
+
+        } catch(HttpExceptionInterface $e) {
+            //$content = $e->getResponse()->getContent();
+            dd($e->getMessage());
+        }
+
+        return json_decode($content, true);
+    }
 
     // getChats pobiera tylko 1 widaomość z karzdego chatu
     public function getChats($sessionName)
@@ -39,7 +56,7 @@ class WhatsAppService implements WhatsAppServiceInterface
 
         return json_decode($content, true);
     }
-
+    
     public function getQrCode()
     {
         $header = ['accept' => 'accept: image/png'];

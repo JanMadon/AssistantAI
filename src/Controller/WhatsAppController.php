@@ -39,9 +39,13 @@ class WhatsAppController extends AbstractController
                         'stopped': $this->whatsAppService->stopSession();
                     break;
 
-                // CHATS
+                // Action for session
                 case 'get_chats':
                     $chats = $this->whatsAppService->getChats($session['name']);
+                    break;
+                case 'get_contacts':
+                    $contacts = $this->whatsAppService->getContacts($session['name']);
+                    dump($contacts);
                     break;
             }
         }
@@ -51,7 +55,8 @@ class WhatsAppController extends AbstractController
             'qrCode' => $qrCode ?? null,
             'startSession' => $startSession ?? null,
             'stopSession' => $stopSession ?? null,
-            'chats' => $chats ?? null
+            'chats' => $chats ?? null,
+            'contacts' => $contacts ?? null,
         ]);
     }
 
