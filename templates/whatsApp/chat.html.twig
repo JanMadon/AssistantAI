@@ -1,0 +1,49 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block body %}
+    <div class="border-top border-bottom">
+        <div class="row">
+            <div class="col-2 chat-list p-0">
+                <ul class="list-group">
+                    {% for chat in chats %}
+                        <li>
+                            <a href="{{ path('whatsApp.chats', {'id': chat.id.user}) }}" class="list-group-item cursor-pointer">
+                                {{ chat.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-10 p-0 d-flex flex-column">
+                <div class="chat-window flex-grow-1">
+                    <div class="chat-message received">
+                        Cześć! Jak się masz?
+                    </div>
+                    <div class="chat-message sent">
+                        Cześć! Wszystko w porządku, a Ty?
+                    </div>
+                    <div class="chat-message received">
+                        Również dobrze, dzięki za pytanie!
+                    </div>
+                    <div class="chat-message sent">
+                        Super! Co słychać?
+                    </div>
+                </div>
+                <div class="message-input">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Napisz wiadomość...">
+                        <button class="btn btn-primary" type="button">Wyślij</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+
+    </script>
+{% endblock %}
