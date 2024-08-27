@@ -60,6 +60,19 @@ class WhatsAppController extends AbstractController
         ]);
     }
 
+    #[Route('/whatsApp/chats/{id}', name: 'whatsApp.chats', methods: ['GET'])]
+    public function chats(Request $request): Response
+    {
+        $id = $request->get('id');
+        $chats = $this->whatsAppService->getChats('default');
+        //$selectedChats = $this->whatsAppService->getChats($id);
+        dump($chats);
+
+        return $this->render('whatsApp/chat.html.twig',[
+            'chats' => $chats
+        ]);
+    }
+
 
 
 

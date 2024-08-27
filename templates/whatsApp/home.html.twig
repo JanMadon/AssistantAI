@@ -1,6 +1,6 @@
 {% extends 'layout/base.html.twig' %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}whatsApp-dashboard{% endblock %}
 
 {% block body %}
     <div class="border-top border-bottom">
@@ -92,17 +92,19 @@
 
                         </div>
                         {% if chats %}
-                        <div class="my-2">
-                            <h6>Your hats: </h6>
-                            {% for chat in chats %}
-                            <a href="?action=#" class="btn btn-secondary">{{ chat.name }}</a>
-                            {% endfor %}
-                        </div>
+                            <div class="my-2">
+                                <h6>Your hats: </h6>
+                                {% for chat in chats %}
+                                    <a href="{{ path('whatsApp.chats', {'id': chat.id.user} )}}"
+                                       class="btn btn-secondary">{{ chat.name }}</a>
+                                {% endfor %}
+                            </div>
                         {% elseif contacts %}
                             <div class="my-2">
                                 <h6>Your Contacts: </h6>
                                 {% for contact in contacts %}
-                                    <a href="?action=#" class="btn btn-secondary">{{ contact.name ?? contact.pushname}}</a>
+                                    <a href="?action=#"
+                                       class="btn btn-secondary">{{ contact.name ?? contact.pushname }}</a>
                                 {% endfor %}
                             </div>
                         {% endif %}
