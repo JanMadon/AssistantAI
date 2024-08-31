@@ -61,15 +61,37 @@ class WhatsAppController extends AbstractController
     }
 
     #[Route('/whatsApp/chats/{id}', name: 'whatsApp.chats', methods: ['GET'])]
-    public function chats(Request $request): Response
+    public function chats(Request $request, $id): Response
     {
-        $id = $request->get('id');
-        $chats = $this->whatsAppService->getChats('default');
-        //$selectedChats = $this->whatsAppService->getChats($id);
-        dump($chats);
+        $sessionName = 'default';
+        $chats = $this->whatsAppService->getChats($sessionName);
+        $rowMessages = $this->whatsAppService->getMessages($sessionName, $id);
+      //  dd($rowMessages);
+        $messages = [];
+        $ackMap = [
+            'wysłana do serwera',
+            'dostarczona do odbiorcy',
+            'wiadomość nie mogła zostać dostarczona',
+            'przeczytana przez odbiorcę',
+        ];
 
-        return $this->render('whatsApp/chat.html.twig',[
-            'chats' => $chats
+        foreach ($rowMessages as $rowMessage) {
+            $time = (new \DateTime("@$rowMessage->timestamp"))->format('Y-m-d H:i:s');
+            $messages[] = [
+                'id' => $rowMessage->id,
+                'fromMe' => $rowMessage->fromMe,
+                'from' => $rowMessage->from,
+                'to' => $rowMessage->to,
+                'body' => $rowMessage->body,
+                'time' => $time,
+                'ack' => ucfirst($ackMap[$rowMessage->ack]) . " - $rowMessage->ackName (#$rowMessage->ack) "
+            ];
+        }
+
+        return $this->render('whatsApp/chat.html.twig', [
+            'chats' => $chats,
+            'id' => $id,
+            'messages' => $messages
         ]);
     }
 

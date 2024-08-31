@@ -48,13 +48,29 @@ class WhatsAppService implements WhatsAppServiceInterface
                 'GET',
                 'http://localhost:3000/api/' . $sessionName . '/chats',
             );
-            $content = $response->getContent();
+            $content = $response->getContent(false);
 
         } catch(HttpExceptionInterface $e) {
             $content = $e->getResponse()->getContent();
         }
 
         return json_decode($content, true);
+    }
+
+    public function getMessages($sessionName, $chatNumber)
+    {
+        try{
+            $response = $this->httpClient->request(
+                'GET',
+                'http://localhost:3000/api/'.$sessionName.'/chats/'.$chatNumber.'/messages', //?downloadMedia=true&limit=100'
+            );
+            $content = $response->getContent(false);
+
+        } catch(HttpExceptionInterface $e) {
+            $content = $e->getResponse()->getContent();
+        }
+
+        return json_decode($content);
     }
     
     public function getQrCode()
