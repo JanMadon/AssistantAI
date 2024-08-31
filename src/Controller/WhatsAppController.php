@@ -11,6 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class WhatsAppController extends AbstractController
 {
+    private string $sessionName = 'default';
     private WhatsAppService $whatsAppService;
 
     public function __construct(WhatsAppService $whatsAppService)
@@ -50,7 +51,7 @@ class WhatsAppController extends AbstractController
             }
         }
 
-        return $this->render('whatsApp/home.html.twig',[
+        return $this->render('whatsApp/home.html.twig', [
             'session' => $session ?? null,
             'qrCode' => $qrCode ?? null,
             'startSession' => $startSession ?? null,
@@ -63,9 +64,17 @@ class WhatsAppController extends AbstractController
     #[Route('/whatsApp/chats/{id}', name: 'whatsApp.chats', methods: ['GET'])]
     public function chats(Request $request, $id): Response
     {
-        $sessionName = 'default';
-        $chats = $this->whatsAppService->getChats($sessionName);
-        $rowMessages = $this->whatsAppService->getMessages($sessionName, $id);
+
+        $chats = $this->whatsAppService->getChats($this->sessionName);
+
+        if($request->isMethod('POST') ) {
+            // todo validacja
+            $message = $request->get('message');
+            $result = $this->whatsAppService->sendMessage($this->sessionName, $id,$message);
+            var_dump($result);
+        }
+
+        $rowMessages = $this->whatsAppService->getMessages($this->sessionName, $id);
       //  dd($rowMessages);
         $messages = [];
         $ackMap = [
@@ -91,12 +100,17 @@ class WhatsAppController extends AbstractController
         return $this->render('whatsApp/chat.html.twig', [
             'chats' => $chats,
             'id' => $id,
-            'messages' => $messages
+            'messages' => $messages,
         ]);
     }
 
-
-
+    #[Route('/whatsApp/chats/{id}', name: 'whatsApp.chats.message', methods: ['POST'])]
+    public function messages(Request $request, $id): Response
+    {
+        $message = $request->get('message');
+        $result = $this->whatsAppService->sendMessage($this->sessionName, $id,$message);
+        return new JsonResponse($result);
+    }
 
     // {session} controllers for api returns JSON:
     #[Route('/api/whatsApp/session/qr', name: 'whatsApp.session.qr', methods: ['GET'])]

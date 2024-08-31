@@ -33,13 +33,16 @@
                 {% endfor %}
                 <div class="message-input">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Napisz wiadomość...">
-                        <button class="btn btn-primary" type="button">Wyślij</button>
+                        <label for="message-inp"></label>
+                        <input id="message-inp" type="text" class="form-control" name="message" placeholder="Napisz wiadomość...">
+                        <button id="send-btn" class="btn btn-primary">Send</button>
+                        <button id="refresh-btn" class="btn btn-secondary" type="button">Refresh</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <div hidden id="messagesFromTwig">{{ messages|json_encode }}</div>
 
     <style>
         .chat-message {
@@ -51,8 +54,8 @@
         }
 
         .chat-window {
-            max-height: 500px;
-            overflow: scroll;
+            height: 700px;
+            overflow: auto;
         }
 
         .sent {
@@ -69,6 +72,36 @@
 
 {% block javascripts %}
     <script>
+        document.addEventListener("DOMContentLoaded", ()=>{
+            const container = document.getElementById('chat-window')
+            container.scrollTop = container.scrollHeight
 
+            const refreshBtn = document.getElementById('refresh-btn')
+            refreshBtn.addEventListener('click', () => {
+                console.log('test')
+                location.reload()
+            })
+
+            const messages = document.getElementById('messagesFromTwig').textContent
+            console.log(JSON.parse(messages))
+
+
+            document.getElementById('send-btn').addEventListener('click', () => {
+                const message = document.getElementById('message-inp').value
+                const formData = new FormData();
+                formData.append('message', message)
+
+                console.log(message)
+                    axios.post("{{ path('whatsApp.chats.message', {'id': id}) }}", formData)
+                        .then(res => {
+                            location.reload()
+                        }).catch(()=>{
+                            console.log('error')
+                    })
+
+            })
+
+
+        })
     </script>
 {% endblock %}

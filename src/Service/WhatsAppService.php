@@ -30,7 +30,7 @@ class WhatsAppService implements WhatsAppServiceInterface
                 'GET',
                 'http://localhost:3000/api/contacts/all?session='. $name
             );
-            $content = $response->getContent();
+            $content = $response->getContent(false);
 
         } catch(HttpExceptionInterface $e) {
             //$content = $e->getResponse()->getContent();
@@ -132,7 +132,7 @@ class WhatsAppService implements WhatsAppServiceInterface
                     'body' => json_encode($body),
                 ]
             );            
-            $content = $response->getContent();
+            $content = $response->getContent(false);
         }  catch (HttpExceptionInterface $e) { 
             $content = $e->getResponse()->getContent(false);
         }
@@ -185,6 +185,34 @@ class WhatsAppService implements WhatsAppServiceInterface
             $content = $e->getResponse()->getContent(false);
         }
 
+        return json_decode($content, true);
+    }
+
+    public function sendMessage($sessionName, $chatId, $body)
+    {
+        $payload = [
+            'chatId' => $chatId,
+            'text' =>  $body,
+            'session' => $sessionName
+        ];
+
+        try {
+            $response = $this->httpClient->request(
+                'POST',
+                'http://localhost:3000/api/sendText',
+                [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Accept' => 'application/json'
+                    ],
+                    'body' => json_encode($payload),
+                ]
+            );
+            $content = $response->getContent();
+
+        } catch (HttpExceptionInterface $e) {
+            $content = $e->getMessage();
+        }
         return json_decode($content, true);
     }
 
