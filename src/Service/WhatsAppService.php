@@ -135,6 +135,8 @@ class WhatsAppService implements WhatsAppServiceInterface
             $content = $response->getContent(false);
         }  catch (HttpExceptionInterface $e) { 
             $content = $e->getResponse()->getContent(false);
+        } catch (TransportExceptionInterface $e) { // low-level problem e.g. bad host
+            return false;
         }
 
         return json_decode($content, true);

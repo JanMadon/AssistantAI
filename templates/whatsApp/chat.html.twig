@@ -20,7 +20,7 @@
             <div class="col-7 p-0 d-flex flex-column">
                 {% for chat in chats %}
                     {% if chat.id.user == id %}
-                        <div class="chat-window flex-grow-1">
+                        <div id="chat-window" class="chat-window flex-grow-1">
                             {% for message in messages %}
                                 <div class="chat-message {{ message.fromMe ? 'sent' : 'received'}}">
                                     {{ message.body }}

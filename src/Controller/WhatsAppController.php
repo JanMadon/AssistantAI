@@ -26,29 +26,27 @@ class WhatsAppController extends AbstractController
 
         $session = $this->whatsAppService->getSession()[0] ?? null; // $session->name
 
-        if($session){
-            switch ($action) {
-                // SESSION
-                case 'start':
-                    $startSession = $this->whatsAppService->startSession();
-                    break;
-                case 'get_qrCode':
-                    $qrCode = $this->whatsAppService->getQrCode();
-                    break;
-                case 'stop':
-                    $stopSession = $this->whatsAppService->stopSession() === null ?
-                        'stopped': $this->whatsAppService->stopSession();
-                    break;
+        switch ($action) {
+            // SESSION
+            case 'start':
+                $startSession = $this->whatsAppService->startSession();
+                break;
+            case 'get_qrCode':
+                $qrCode = $this->whatsAppService->getQrCode();
+                break;
+            case 'stop':
+                $stopSession = $this->whatsAppService->stopSession() === null ?
+                    'stopped' : $this->whatsAppService->stopSession();
+                break;
 
-                // Action for session
-                case 'get_chats':
-                    $chats = $this->whatsAppService->getChats($session['name']);
-                    break;
-                case 'get_contacts':
-                    $contacts = $this->whatsAppService->getContacts($session['name']);
-                    dump($contacts);
-                    break;
-            }
+            // Action for session
+            case 'get_chats':
+                $chats = $this->whatsAppService->getChats($session['name']);
+                break;
+            case 'get_contacts':
+                $contacts = $this->whatsAppService->getContacts($session['name']);
+                dump($contacts);
+                break;
         }
 
         return $this->render('whatsApp/home.html.twig', [

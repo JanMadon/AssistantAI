@@ -14,15 +14,21 @@
                     </div>
                     {% if  startSession.name is defined %}
                         <div class="card-body">
+                            <p class="card-text text-success"> Connect is ok, starting is ok</p>
                             <p class="card-text">name: <b>{{ startSession.name ?? "-" }}</b></p>
                             <p class="card-text">status: <b>{{ startSession.status ?? "-" }}</b></p>
                             {#                        <p class="card-text">config(arr): <b>{{ startSession.error ?? "-" }}</b></p> #}
                         </div>
                     {% elseif  startSession.error is defined %}
                         <div class="card-body">
+                            <p class="card-text text-warning">Connection successful but a problem occurred</p>
                             <p class="card-text">statusCode: <b>{{ startSession.statusCode ?? "-" }}</b></p>
                             <p class="card-text">message: <b>{{ startSession.message ?? "-" }}</b></p>
                             <p class="card-text">error: <b>{{ startSession.error ?? "-" }}</b></p>
+                        </div>
+                    {% elseif  startSession is same as(false) %}
+                        <div class="card-body">
+                            <p class="card-text text-danger">can't connect to whatsApp server</p>
                         </div>
                     {% endif %}
                 </div>
@@ -52,10 +58,12 @@
                     </div>
                     <div class="card-body">
                         <p class="card-text">name: <b>{{ session.name ?? "-" }}</b></p>
-                        <p class="card-text">status: <b>{{ session.status ?? "-" }}</b></p>
-                        <p class="card-text">me: <b>{{ session.me ? session.me|join(', ') :'empty' }}</b></p>
-                        <p class="card-text">config: <b>arr</b></p>
-                        <p class="card-text">engine: <b>arr</b></p>
+                        <p class="card-text {{session.status == 'WORKING' ? 'text-success' : ''}}">
+                            status: <b>{{ session.status ?? "-" }}</b>
+                        </p>
+                        <p class="card-text">Me: <b>{{ session ? session.me|join(', ') :'empty' }}</b></p>
+                        <p class="card-text">Webhooks: <b>{{ session ? session.config.webhooks[0].url : 'empty'}}</b></p>
+                        <p class="card-text">engine state: <b>{{ session ? session.engine.state : 'empty'}}</b></p>
                     </div>
                 </div>
             </div>
@@ -81,7 +89,7 @@
             </div>
         </div>
     </div>
-    {% if session.me %}
+    {% if session %}
         <div class="border-top border-bottom">
             <div class="row m-1">
                 <div>
