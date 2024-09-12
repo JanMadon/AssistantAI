@@ -65,15 +65,15 @@ class WhatsAppController extends AbstractController
 
         $chats = $this->whatsAppService->getChats($this->sessionName);
 
-        if($request->isMethod('POST') ) {
+        if ($request->isMethod('POST')) {
             // todo validacja
             $message = $request->get('message');
-            $result = $this->whatsAppService->sendMessage($this->sessionName, $id,$message);
+            $result = $this->whatsAppService->sendMessage($this->sessionName, $id, $message);
             var_dump($result);
         }
 
         $rowMessages = $this->whatsAppService->getMessages($this->sessionName, $id);
-      //  dd($rowMessages);
+        //  dd($rowMessages);
         $messages = [];
         $ackMap = [
             'wysłana do serwera',
@@ -106,7 +106,7 @@ class WhatsAppController extends AbstractController
     public function messages(Request $request, $id): Response
     {
         $message = $request->get('message');
-        $result = $this->whatsAppService->sendMessage($this->sessionName, $id,$message);
+        $result = $this->whatsAppService->sendMessage($this->sessionName, $id, $message);
         return new JsonResponse($result);
     }
 
