@@ -54,7 +54,7 @@
         function fillChatBox(selectConv) {
             //clear
             let showingMessages = conversation.querySelectorAll('.conversation')
-            for(let message of showingMessages){
+            for (let message of showingMessages) {
                 message.remove()
             }
             systemInput.value = ''
@@ -109,7 +109,7 @@
                     console.error($site)
                 }
             }
-            return await askChat(system, conversation)
+            return (await askChat(system, conversation)).replace("```python", "<pre>").replace("```", "</pre>");
         }
 
         async function askChat(system, conversation) {
