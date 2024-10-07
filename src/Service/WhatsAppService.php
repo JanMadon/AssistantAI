@@ -14,6 +14,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class WhatsAppService implements WhatsAppServiceInterface
 {
 
+    private string $url;
     private ParameterBagInterface $config;
     private HttpClientInterface $httpClient;
 
@@ -21,59 +22,32 @@ class WhatsAppService implements WhatsAppServiceInterface
     {
         $this->config = $config;
         $this->httpClient = $httpClient;
+        $this->url = 'http://localhost:3000/api/';
     }
     
     public function getContacts($name)
     {
-        try{
-            $response = $this->httpClient->request(
-                'GET',
-                'http://localhost:3000/api/contacts/all?session='. $name
-            );
-            $content = $response->getContent(false);
-
-        } catch(HttpExceptionInterface $e) {
-            //$content = $e->getResponse()->getContent();
-            dd($e->getMessage());
-        }
-
-        return json_decode($content, true);
+        $endpoint = "contacts/all?session=$name";
+        $result = $this->makeRequest('GET', $endpoint, [] );
+        return json_decode($result, true);
     }
 
     // getChats pobiera tylko 1 widaomość z karzdego chatu
     public function getChats($sessionName)
     {
-        try{
-            $response = $this->httpClient->request(
-                'GET',
-                'http://localhost:3000/api/' . $sessionName . '/chats',
-            );
-            $content = $response->getContent(false);
-
-        } catch(HttpExceptionInterface $e) {
-            $content = $e->getResponse()->getContent();
-        }
-
-        return json_decode($content, true);
+        $endpoint = "$sessionName/chats";
+        $result = $this->makeRequest('GET', $endpoint, [] );
+        return json_decode($result, true);
     }
 
     public function getMessages($sessionName, $chatNumber)
     {
-        try{
-            $response = $this->httpClient->request(
-                'GET',
-                'http://localhost:3000/api/'.$sessionName.'/chats/'.$chatNumber.'/messages', //?downloadMedia=true&limit=100'
-            );
-            $content = $response->getContent(false);
-
-        } catch(HttpExceptionInterface $e) {
-            $content = $e->getResponse()->getContent();
-        }
-
-        return json_decode($content);
+        $endpoint = "$sessionName/chats/$chatNumber/messages"; //?downloadMedia=true&limit=100'
+        $result = $this->makeRequest('GET', $endpoint, [] );
+        return json_decode($result);
     }
     
-    public function getQrCode()
+    public function getQrCode(): string
     {
         $header = ['accept' => 'accept: image/png'];
         $image = $this->makeRequest('GET', 'default/auth/qr?format=image', $header);
@@ -82,22 +56,18 @@ class WhatsAppService implements WhatsAppServiceInterface
 
     public function getSession()
     {
-        try{
-            $response = $this->httpClient->request(
-                'GET',
-                'http://localhost:3000/api/sessions?all=true',
-            );
-
-            $content = $response->getContent();
-
-        } catch(HttpExceptionInterface $e) {
-            $content = $e->getResponse()->getContent();
-        }
-        return json_decode($content, true);
+        $endpoint = "sessions?all=true";
+        $result = $this->makeRequest('GET', $endpoint, [] );
+        return json_decode($result);
     }
 
     public function startSession()
     {
+        $endpoint = "sessions/start";
+        $header = [
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json'
+        ];
         $body = [
             "name" => "default",
             "config" => [
@@ -118,104 +88,55 @@ class WhatsAppService implements WhatsAppServiceInterface
                 ],
                 "debug" => true
             ]
-        ];        
+        ];
 
-        try {
-            $response = $this->httpClient->request(
-                'POST',
-                'http://localhost:3000/api/sessions/start',
-                [
-                    'headers' => [
-                        'Content-Type' => 'application/json',
-                        'Accept' => 'application/json'
-                    ],
-                    'body' => json_encode($body),
-                ]
-            );            
-            $content = $response->getContent(false);
-        }  catch (HttpExceptionInterface $e) { 
-            $content = $e->getResponse()->getContent(false);
-        } catch (TransportExceptionInterface $e) { // low-level problem e.g. bad host
-            return false;
-        }
-
-        return json_decode($content, true);
+        $result = $this->makeRequest('POST', $endpoint, $header, $body);
+        return json_decode($result, true);
     }
 
     public function stopSession()
     {
-        $body = ['name' => 'default'];  
+        $body = ['name' => 'default'];
+        $header = [
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json'
+        ];
+        $endpoint = "sessions/stop";
 
-        try {
-            $response = $this->httpClient->request(
-                'POST',
-                'http://localhost:3000/api/sessions/stop',
-                [
-                    'headers' => [
-                        'Content-Type' => 'application/json',
-                        'Accept' => 'application/json'
-                    ],
-                    'body' => json_encode($body),
-                ]
-            );            
-            $content = $response->getContent();
-        }  catch (HttpExceptionInterface $e) { 
-            $content = $e->getResponse()->getContent(false);
-        }
+        $result = $this->makeRequest('POST', $endpoint, $header, $body);
 
-        return json_decode($content, true);
+        return json_decode($result, true);
     }
 
     public function logoutSession()
     {
         $body = ['name' => 'default'];
+        $header = [
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json'
+        ];
+        $endpoint = "sessions/logout";
+        $result = $this->makeRequest('POST', $endpoint, $header, $body);
 
-        try {
-            $response = $this->httpClient->request(
-                'POST',
-                'http://localhost:3000/api/sessions/logout',
-                [
-                    'headers' => [
-                        'Content-Type' => 'application/json',
-                        'Accept' => 'application/json'
-                    ],
-                    'body' => json_encode($body),
-                ]
-            );
-            $content = $response->getContent();
-        }  catch (HttpExceptionInterface $e) {
-            $content = $e->getResponse()->getContent(false);
-        }
-
-        return json_decode($content, true);
+        return json_decode($result, true);
     }
 
     public function sendMessage($sessionName, $chatId, $body)
     {
-        $payload = [
+        $body = [
             'chatId' => $chatId,
             'text' =>  $body,
             'session' => $sessionName
         ];
+        $header = [
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json'
+        ];
+        $endpoint = "sendText";
 
-        try {
-            $response = $this->httpClient->request(
-                'POST',
-                'http://localhost:3000/api/sendText',
-                [
-                    'headers' => [
-                        'Content-Type' => 'application/json',
-                        'Accept' => 'application/json'
-                    ],
-                    'body' => json_encode($payload),
-                ]
-            );
-            $content = $response->getContent();
+        $result = $this->makeRequest('POST', $endpoint, $header, $body);
 
-        } catch (HttpExceptionInterface $e) {
-            $content = $e->getMessage();
-        }
-        return json_decode($content, true);
+        return json_decode($result, true);
     }
 
     private function makeRequest(string $method, string $endpoint, array $headers, ?array $body = null,)
@@ -223,24 +144,25 @@ class WhatsAppService implements WhatsAppServiceInterface
         try {
             $response = $this->httpClient->request(
                 $method,
-                'http://localhost:3000/api/' . $endpoint,
+                $this->url . $endpoint,
                 [
                     'headers' => $headers,
                     'body' => json_encode($body),
                 ]
             );
             $content = $response->getContent();
-        } catch (ClientExceptionInterface $e) {
-            $content = $e->getResponse()->getContent(false);
-        } catch (ServerExceptionInterface $e) {
-            $content = $e->getResponse()->getContent(false);
-        } catch (RedirectionExceptionInterface $e) {
-            $content = $e->getResponse()->getContent(false);
+        } catch (HttpExceptionInterface|ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface $e) {
+            $content = $e->getResponse()->getContent();
         } catch (TransportExceptionInterface $e) {
-            dd($e->getMessage());
-        } catch (\Exception $e) {
-            dd($e->getMessage());
+            $content = $e->getMessage();
         }
+/*
+* ClientExceptionInterface -> Dotyczy błędów po stronie klienta (4xx), np. 404 (Not Found) czy 400 (Bad Request).
+* RedirectionExceptionInterface -> Dotyczy przekierowań (3xx), np. 301 (Moved Permanently) czy 302 (Found).
+* ServerExceptionInterface -> Dotyczy błędów po stronie serwera (5xx), np. 500 (Internal Server Error) czy 503 (Service Unavailable).
+* HttpExceptionInterface -> Ogólny wyjątek HTTP, który obejmuje wszystkie powyższe sytuacje związane z odpowiedzią HTTP, bez względu na konkretny typ błędu (klient, serwer, przekierowanie).
+* TransportExceptionInterface -> Najbardziej ogólny, dotyczy problemów z transportem, np. braku połączenia, timeoutów, problemów sieciowych, niezależnie od odpowiedzi HTTP.
+*/
         return $content;
     }
 }
