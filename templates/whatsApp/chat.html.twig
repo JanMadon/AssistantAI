@@ -40,9 +40,16 @@
                     </div>
                 </div>
             </div>
+            <div class="col-3">
+                <div class="system p-2">
+                    <label for="system-window" class="form-label">System</label>
+                    <textarea class="form-control system-textarea" id="system-window" rows="10"> </textarea>
+                </div>
+            </div>
         </div>
     </div>
-    <div hidden id="messagesFromTwig">{{ messages|json_encode }}</div>
+{#    <div hidden id="messagesFromTwig">{{ messages|json_encode }}</div>#}
+
 
     <style>
         .chat-message {

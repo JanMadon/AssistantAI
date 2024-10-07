@@ -58,9 +58,11 @@
                     </div>
                     <div class="card-body">
                         <p class="card-text">name: <b>{{ session.name ?? "-" }}</b></p>
-                        <p class="card-text {{session.status == 'WORKING' ? 'text-success' : ''}}">
-                            status: <b>{{ session.status ?? "-" }}</b>
-                        </p>
+                        {% if session %}
+                            <p class="card-text {{session.status == 'WORKING' ? 'text-success' : ''}}">
+                                status: <b>{{ session.status ?? "-" }}</b>
+                            </p>
+                        {% endif %}
                         <p class="card-text">Me: <b>{{ session ? session.me|join(', ') :'empty' }}</b></p>
                         <p class="card-text">Webhooks: <b>{{ session ? session.config.webhooks[0].url : 'empty'}}</b></p>
                         <p class="card-text">engine state: <b>{{ session ? session.engine.state : 'empty'}}</b></p>
@@ -123,4 +125,20 @@
         </div>
     {% endif %}
 
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+
+        const sessionStartBtn = document.querySelector('#session-start-btn')
+
+        sessionStartBtn.addEventListener('click', (e) => {
+            console.log('sesion start');
+            axios.get("{{ path('whatsApp.session.get') }}")
+                .then(res => {
+                    console.log(res.data)
+                })
+        })
+
+    </script>
 {% endblock %}
