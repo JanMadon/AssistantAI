@@ -7,25 +7,27 @@
     {{ encore_entry_link_tags('app') }}
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light">
-    <a class="navbar-brand" href="#">My Dashboard</a>
+<nav class="navbar navbar-expand-lg navbar-light bg-secondary-subtle p-2 ">
+    <a class="nav-link fs-5" href={{ path('home') }}>MY-ASSIST</a>
     <div class="collapse navbar-collapse">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-                <a class="nav-link" href="/">Home</a>
+                <a class="nav-link  {{ app.request.pathInfo == path('home') ? 'fw-bold text-white' }}" href={{ path('home') }}>Home</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href={{ path('assistant') }}>Assistant</a>
+                <a class="nav-link {{ app.request.pathInfo == path('assistant') ? 'fw-bold text-white' }}" href={{ path('assistant') }}>Assistant</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href={{ path('whatsApp.home') }}>WhatsApp</a>
+                <a class="nav-link {{ app.request.pathInfo == path('whatsApp.home') ? 'fw-bold text-white' }}" href={{ path('whatsApp.home') }}>WhatsApp</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">Settings</a>
+                <a class="nav-link {{ app.request.pathInfo == path('aidevs3_prework_main') ? 'fw-bold text-white' }}" href={{ path('aidevs3_prework_main') }}>AiDev3</a>
+            </li>
+            <li class="nav-item">
+{#                <a class="nav-link {{ app.request.pathInfo == path('home') ? 'fw-bold text-white' }}" href="#">Settings</a>#}
             </li>
         </ul>
     </div>
-
     <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
             aria-controls="offcanvasNavbar">
         <span class="navbar-toggler-icon"></span>
