@@ -1,7 +1,9 @@
-<aside id="sidebar" class="main">
+<aside id="sidebar" class="main bg-secondary-subtle">
     <div class="mr-0">
         <button class="toggle-btn" type="button">
-            <p>MENU</p>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+            </svg>
         </button>
     </div>
     <ul class="sidebar-nav">
@@ -12,7 +14,7 @@
             </h6>
             <ul id="template_messages" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                 {% for template in templates %}
-                    <li id="{{ template.id }}" class="sidebar-item cursor-pointer">
+                    <li id="{{ template.id }}" class="sidebar-item cursor-pointer border-bottom">
                         <p>{{ template.id }} {{ template.name }} </p>
                         <p hidden>{{ template.content }}</p>
                     </li>
@@ -29,7 +31,7 @@
             </h6>
             <ul id="last-conversation" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                 {% for conversation in conversations %}
-                    <li id="{{ conversation.id }}" class="sidebar-item cursor-pointer">
+                    <li id="{{ conversation.id }}" class="sidebar-item cursor-pointer border-bottom">
                         <p>{{ conversation.id }}. {{ conversation.name }}!!!</p>
                     </li>
                 {% endfor %}

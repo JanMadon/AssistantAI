@@ -4,18 +4,20 @@
 {% block title %}AI Assistant{% endblock %}
 
 {% block body %}
-    <div class="container-fluid row">
-        <div class="row">
+    <div class="container-fluid row w-100 mx-0 px-0">
+        <div class="row mx-0 px-0" >
             {% include 'assistant/assistant-bar.html.twig' %}
-            <div class="col">
+            <div class="col mt-2">
                 <div class="form-group">
-                    <h5 for="systemInput">System</h5>
+                    <h5>System</h5>
+                    <label for="systemInput"></label>
                     <textarea style="height: 500px;" class="form-control d-inline-block" id="systemInput"
-                              placeholder="Enter system command or info"> </textarea>
+                                                               placeholder="Enter system command or info">
+                    </textarea>
                 </div>
             </div>
 
-            <div class="chat col d-flex flex-column justify-content-between">
+            <div class="chat col d-flex flex-column justify-content-between mt-2">
                 <div class="chat-box" id="chatBox">
                     <h5>Conversation</h5>
                 </div>

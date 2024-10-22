@@ -8,8 +8,8 @@
 }
 
 .main {
-    color: black;
-    border-top-right-radius: 10px;
+    color: #ffffff;
+    /*border-top-right-radius: 10px;*/
     height: 100vh;
     overflow: hidden;
     transition: all 0.35s ease-in-out;
@@ -17,8 +17,7 @@
 }
 
 #sidebar {
-    width: 70px;
-    min-width: 70px;
+    max-width: 50px;
     z-index: 1000;
     transition: all .25s ease-in-out;
     background-color: #4c627b;
@@ -27,8 +26,7 @@
 }
 
 #sidebar.expand {
-    width: 300px;
-    min-width: 300px;
+    max-width: 300px;
 }
 
 .toggle-btn {
@@ -65,7 +63,7 @@ a.sidebar-link {
 
 a.sidebar-link:hover {
     background-color: rgba(255, 255, 255, .075);
-    border-left: 3px solid #3b7ddd;
+    border-left: 3px solid #304147;
 }
 
 .sidebar-submenu{
@@ -74,7 +72,7 @@ a.sidebar-link:hover {
 
 .sidebar-item {
     position: relative;
-    color: black;
+    color: white;
     transition: background-color 0.3s;
 
 }
@@ -85,7 +83,7 @@ a.sidebar-link:hover {
 }
 
 .sidebar-item:hover {
-    background-color: #355883;
+    background-color: #2f353d;
 }
 
 #sidebar:not(.expand) .sidebar-item .sidebar-dropdown {
