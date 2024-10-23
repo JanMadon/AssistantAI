@@ -12,6 +12,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException as SymfonyHttpException
 
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class GPTservice
@@ -30,12 +31,10 @@ class GPTservice
         $this->httpClient = $httpClient;
     }
 
-    public function prompt(string $model, string $system, array $contents)
+    public function prompt(string $system, array $contents, string $model = 'gpt-3.5-turbo')
     {
         $contents = $this->prepareConversationArray($contents);
 
-        //$model = 'gpt-3.5-turbo';
-        //$model = 'gpt-4';
         $payload = [
             'model' => $model,
             'messages' => [
@@ -69,6 +68,31 @@ class GPTservice
         return $response;
     }
 
+    public function getChatModels()
+    {
+        try {
+            $response = $this->httpClient->request(
+                'GET',
+                'https://api.openai.com/v1/models',
+                [
+                   'headers' => [
+                       'Accept' => 'application/json',
+                       'Authorization' => 'Bearer ' . $this->config->get('API_KEY_OPENAI')
+                   ]
+                ]);
+            $response = json_decode($response->getContent(false));
+        } catch (ClientException $exception) {
+            $response = $exception->getMessage();
+        }  catch (HttpExceptionInterface $exception) {
+            $response = $exception->getMessage();
+        } catch (\Exception $exception) {
+            $response = 'Unexpected error: ' . $exception->getMessage();
+        } catch (TransportExceptionInterface $e) {
+        }
+
+        return $response->data ?? null;
+    }
+
     private function prepareConversationArray(array $conversation): array
     {
         $preparedConversation = [];
@@ -89,5 +113,6 @@ class GPTservice
 
         return $preparedConversation;
     }
+
 }
 

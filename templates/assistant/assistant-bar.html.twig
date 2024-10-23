@@ -71,11 +71,9 @@
     // set new template
     document.addEventListener("DOMContentLoaded", () => {
         const templateForm = document.getElementById('template_form');
-        console.log(templateForm)
         templateForm.addEventListener('submit', e => {
             e.preventDefault()
             const templateData = new FormData(templateForm)
-            console.log(templateData);
 
             axios.post('https://localhost:8000/api/assistant/template', templateData)
                 .then(function (response) {

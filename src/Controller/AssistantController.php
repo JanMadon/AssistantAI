@@ -43,20 +43,25 @@ class AssistantController extends AbstractController
     #[Route('/assistant', 'assistant', methods: ['GET'])]
     public function assistant(Request $request, SerializerInterface $serializer): Response
     {
+        $models = array_map(function ($model){
+            return $model->id;
+        }, $this->gptService->getChatModels());
+
         $conversations = $this->conversationRepository->findBy([], ['id' => 'DESC']);
         $conversationsJson = $serializer->serialize($conversations, 'json', ['groups' => 'conversation']);
         $templates = $this->templateRepository->findBy([], ['id' => 'DESC']);;
         return $this->render('assistant/main.html.twig', [
             'conversations' => $conversations,
             'conversationsJson' => $conversationsJson,
-            'templates' => $templates
+            'templates' => $templates,
+            'models' => $models,
         ]);
     }
 
     #[Route('/api/assistant/prompt', 'assistent_prompt', methods:['POST'])]
     public function assistantConversation(Request $request): Response
     {
-        // request {id,system, conversation}
+        // request {id,system, conversation, model}
         $request = json_decode($request->getContent(), true);
         $messageUser = end($request['conversation']);
         $conversationId = $request['id'] ?? null;
@@ -79,9 +84,9 @@ class AssistantController extends AbstractController
         $message->setContent(reset($messageUser));
         $message->setConversation($conversation);
         $this->entityManager->persist($message);
-        $this->entityManager->flush($message);
+        $this->entityManager->flush();
 
-        $answer = $this->gptService->prompt('gpt-3.5-turbo', $request['system'], $request['conversation']);
+        $answer = $this->gptService->prompt($request['system'], $request['conversation'], $request['model']);
 
         $messageAi = new Message();
         $messageAi->setAuthor('AI');

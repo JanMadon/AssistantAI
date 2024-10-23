@@ -11,7 +11,7 @@
                 <div class="form-group">
                     <h5>System</h5>
                     <label for="systemInput"></label>
-                    <textarea style="height: 500px;" class="form-control d-inline-block" id="systemInput"
+                    <textarea style="height: 300px;" class="form-control d-inline-block" id="systemInput"
                                                                placeholder="Enter system command or info">
                     </textarea>
                 </div>
@@ -23,13 +23,22 @@
                 </div>
                 <div class="input-section ">
                     <div class="input-group">
-                        <input type="text" class="form-control" id="userInput" placeholder="Type your message...">
-                        <div class="input-group-append">
-                            <button class="btn btn-primary" type="button" onclick="sendMessage()">
-                                Send
-                            </button>
-                        </div>
+                        <label for="userInput"></label>
+                        <textarea type="text" class="form-control" id="userInput" placeholder="Type your message..." onkeydown="checkEnter(event)">
+                        </textarea>
+                        <button class="btn btn-primary" type="button" onclick="sendMessage()">Send</button>
                     </div>
+                </div>
+            </div>
+
+            <div class="col-2 border-start bg-secondary-subtle p-0">
+                <div class="border-bottom p-3">
+                    <label> Model </label>
+                    <select id="model-selektor" class="form-select form-select-sm" aria-label="Default select example">
+                        {% for model in models %}
+                            <option value="{{ model }}" {{ model == 'gpt-3.5-turbo' ? 'selected' : '' }} >{{ model }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
             </div>
 
@@ -44,6 +53,13 @@
         let userInput = document.getElementById('userInput')
         let conversation = document.getElementById('chatBox')
         let conversation_id = null;
+
+        function checkEnter(event){
+            if(event.key === 'Enter'){
+                sendMessage()
+            }
+        }
+
 
         fillSystemField = (content) => {
             let showingMessages = conversation.querySelectorAll('.conversation')
@@ -96,7 +112,6 @@
 
         async function getAIResponse(system, chatBox) {
             let messages = chatBox.getElementsByClassName('conversation')
-            console.log(messages);
             const conversation = [];
 
             for (let message of messages) {
@@ -118,7 +133,8 @@
             const data = {
                 'id': conversation_id,
                 'system': system,
-                'conversation': conversation
+                'conversation': conversation,
+                'model': document.getElementById("model-selektor").value ?? null
             }
             console.log(JSON.stringify(data))
 
