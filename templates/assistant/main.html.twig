@@ -5,14 +5,14 @@
 
 {% block body %}
     <div class="container-fluid row w-100 mx-0 px-0">
-        <div class="row mx-0 px-0" >
+        <div class="row mx-0 px-0">
             {% include 'assistant/assistant-bar.html.twig' %}
             <div class="col mt-2">
                 <div class="form-group">
                     <h5>System</h5>
                     <label for="systemInput"></label>
                     <textarea style="height: 300px;" class="form-control d-inline-block" id="systemInput"
-                                                               placeholder="Enter system command or info">
+                              placeholder="Enter system command or info">
                     </textarea>
                 </div>
             </div>
@@ -24,7 +24,8 @@
                 <div class="input-section ">
                     <div class="input-group">
                         <label for="userInput"></label>
-                        <textarea type="text" class="form-control" id="userInput" placeholder="Type your message..." onkeydown="checkEnter(event)">
+                        <textarea type="text" class="form-control" id="userInput" placeholder="Type your message..."
+                                  onkeydown="checkEnter(event)">
                         </textarea>
                         <button class="btn btn-primary" type="button" onclick="sendMessage()">Send</button>
                     </div>
@@ -33,29 +34,57 @@
 
             <div class="col-2 border-start bg-secondary-subtle p-0">
                 <div class="border-bottom p-3">
-                    <label> Model </label>
-                    <select id="model-selektor" class="form-select form-select-sm" aria-label="Default select example">
+                    <label for="modelSelektor"> Model </label>
+                    <select id="modelSelektor" class="form-select form-select-sm" aria-label="Default select example">
                         {% for model in models %}
                             <option value="{{ model }}" {{ model == 'gpt-3.5-turbo' ? 'selected' : '' }} >{{ model }}</option>
                         {% endfor %}
                     </select>
                 </div>
+
+                <div class="border-bottom p-3 border">
+                    <div class="d-flex justify-content-between align-items-center w-min">
+                        <label for="temperatureRange" class="form-label">Temperature</label>
+                        <input type="number" class="form-control number-control form-control-sm w-25"
+                               id="temperatureNumber" min="0" max="2" step="0.01" value="1" disabled>
+                    </div>
+                    <input type="range" class="form-range" id="temperatureRange" min="0" max="2" step="0.01">
+                </div>
             </div>
 
         </div>
     </div>
+    <style>
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Dla Firefoksa */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
 {% endblock %}
 
 
 {% block javascripts %}
     <script>
+        const temperatureRange = document.getElementById('temperatureRange')
+        const temperatureNumber = document.getElementById('temperatureNumber')
+        temperatureRange.addEventListener('input', () => {
+            temperatureNumber.value = temperatureRange.value
+        })
+
+
         let systemInput = document.getElementById('systemInput')
         let userInput = document.getElementById('userInput')
         let conversation = document.getElementById('chatBox')
         let conversation_id = null;
 
-        function checkEnter(event){
-            if(event.key === 'Enter'){
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
                 sendMessage()
             }
         }
@@ -63,7 +92,7 @@
 
         fillSystemField = (content) => {
             let showingMessages = conversation.querySelectorAll('.conversation')
-            for(let message of showingMessages){
+            for (let message of showingMessages) {
                 message.remove()
             }
             systemInput.value = content
@@ -134,10 +163,13 @@
                 'id': conversation_id,
                 'system': system,
                 'conversation': conversation,
-                'model': document.getElementById("model-selektor").value ?? null
+                'model': document.getElementById("modelSelektor").value ?? null,
+                'config': {
+                    'temperature': temperatureNumber.value,
+                }
             }
-            console.log(JSON.stringify(data))
 
+            console.log(JSON.stringify(data))
             try {
                 const response = await axios.post("{{ path('assistent_prompt') }}", data)
                 conversation_id = response.data.id

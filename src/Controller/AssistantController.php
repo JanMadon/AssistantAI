@@ -86,7 +86,7 @@ class AssistantController extends AbstractController
         $this->entityManager->persist($message);
         $this->entityManager->flush();
 
-        $answer = $this->gptService->prompt($request['system'], $request['conversation'], $request['model']);
+        $answer = $this->gptService->prompt($request['system'], $request['conversation'], $request['model'], $request['config']);
 
         $messageAi = new Message();
         $messageAi->setAuthor('AI');

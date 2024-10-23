@@ -31,7 +31,7 @@ class GPTservice
         $this->httpClient = $httpClient;
     }
 
-    public function prompt(string $system, array $contents, string $model = 'gpt-3.5-turbo')
+    public function prompt(string $system, array $contents, string $model = 'gpt-3.5-turbo', $config = [])
     {
         $contents = $this->prepareConversationArray($contents);
 
@@ -45,6 +45,10 @@ class GPTservice
                 ...$contents
             ]
         ];
+
+        if(isset($config['temperature'])){
+            $payload['temperature'] = $config['temperature'];
+        }
 
         try {
             $response = $this->httpClient->request('POST', $this->url, [
