@@ -1,5 +1,4 @@
 <?php
-// src/Controller/LuckyController.php
 namespace App\Controller;
 
 use App\Entity\Conversation;
@@ -7,13 +6,11 @@ use App\Entity\Message;
 use App\Entity\Template;
 use App\Repository\ConversationRepository;
 use App\Repository\TemplateRepository;
+use App\Service\Chat\ConversationService;
+use App\Service\Chat\MessageService;
 use App\Service\GPTservice;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
-use phpDocumentor\Reflection\Type;
-use PhpParser\Node\Stmt\TryCatch;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,8 +22,9 @@ class AssistantController extends AbstractController
 {
 
     private GPTservice $gptService;
-    private ConversationRepository $conversationRepository;
     private EntityManagerInterface $entityManager;
+    private ConversationRepository $conversationRepository;
+    private TemplateRepository $templateRepository;
 
     public function __construct(
         GPTservice $gptService,
@@ -59,45 +57,28 @@ class AssistantController extends AbstractController
     }
 
     #[Route('/api/assistant/prompt', 'assistent_prompt', methods:['POST'])]
-    public function assistantConversation(Request $request): Response
+    public function assistantConversation(
+        Request $request,
+        ConversationService $conversationService,
+        MessageService $messageService): Response
     {
         // request {id,system, conversation, model}
-        $request = json_decode($request->getContent(), true);
-        $messageUser = end($request['conversation']);
-        $conversationId = $request['id'] ?? null;
+        $requestData = json_decode($request->getContent());
+        $conversation = $conversationService->getOrCreateConversation($requestData);
 
-        $ConvRepository = $this->entityManager->getRepository(Conversation::class);
+        $messageService->saveMessage($requestData, $conversation);
 
-        if (!$conversationId) {
-            $conversation = new Conversation();
-            $conversation->setName(reset($messageUser));
-        } else {
-            $conversation =  $ConvRepository->find($conversationId);
-        }
-        $conversation->setSystemField($request['system']);
-        $this->entityManager->persist($conversation);
-        $this->entityManager->flush($conversation);
-        $conversationId = $conversation->getId();
+        $answer = $this->gptService->prompt(
+            $requestData->system,
+            $requestData->conversation,
+            $requestData->model,
+            $requestData->config);
 
-        $message = new Message();
-        $message->setAuthor(array_key_first($messageUser));
-        $message->setContent(reset($messageUser));
-        $message->setConversation($conversation);
-        $this->entityManager->persist($message);
-        $this->entityManager->flush();
-
-        $answer = $this->gptService->prompt($request['system'], $request['conversation'], $request['model'], $request['config']);
-
-        $messageAi = new Message();
-        $messageAi->setAuthor('AI');
-        $messageAi->setContent($answer);
-        $messageAi->setConversation($conversation);
-        $this->entityManager->persist($messageAi);
-        $this->entityManager->flush($messageAi);
+        $messageService->saveMessage($answer, $conversation);
 
         return new JsonResponse([
             'answer' => $answer,
-            'id' => $conversationId,
+            'id' => $conversation->getId(),
         ], 200);
     }
 

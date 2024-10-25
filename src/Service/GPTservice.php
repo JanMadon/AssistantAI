@@ -46,13 +46,13 @@ class GPTservice
             ]
         ];
 
-        if(isset($config['temperature'])){
-            $payload['temperature'] = $config['temperature'];
+        if(property_exists($config, 'temperature')){
+            $payload['temperature'] = (float) $config->temperature;
         }
 
         try {
             $response = $this->httpClient->request('POST', $this->url, [
-                'json' => $payload, // symfony zam konwertuje na jsona
+                'json' => $payload, // symfony sam konwertuje na jsona
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
@@ -60,6 +60,8 @@ class GPTservice
                     'Authorization' => 'Bearer ' . $this->config->get('API_KEY_OPENAI')
                 ]
             ]);
+
+            //dd($response->getContent(false));
             $response = json_decode($response->getContent(false))->choices[0]->message->content;
         } catch (ClientException $exception) {
             $response = $exception->getMessage();
@@ -101,16 +103,18 @@ class GPTservice
     {
         $preparedConversation = [];
         foreach ($conversation as $messages) {
-            if (array_keys($messages)[0] === 'User') {
+            //dd();
+
+            if (property_exists($messages, 'User')) {
                 $preparedConversation[] = [
                     'role' => 'user',
-                    'content' => $messages['User']
+                    'content' => $messages->User
                 ];
             }
-            if (array_keys($messages)[0] === 'AI') {
+            if (property_exists($messages, 'AI')) {
                 $preparedConversation[] = [
                     'role' => 'assistant',
-                    'content' => $messages['AI']
+                    'content' => $messages->AI
                 ];
             }
         }
