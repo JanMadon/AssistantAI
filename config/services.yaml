@@ -9,7 +9,9 @@ parameters:
     API_KEY_RENDER_FORM: '%env(API_KEY_RENDER_FORM)%'
     API_KEY_SERPAPI: '%env(API_KEY_SERPAPI)%'
     SERVER_WHATSAPP: '%env(SERVER_WHATSAPP)%'
-                      
+    API_KEY_TRELLO: '%env(API_KEY_TRELLO)%'
+    API_TOKEN_TRELLO: '%env(API_TOKEN_TRELLO)%'
+
 
 
 
