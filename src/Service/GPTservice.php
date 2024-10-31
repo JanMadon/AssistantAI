@@ -51,15 +51,19 @@ class GPTservice
         }
 
         try {
-            $response = $this->httpClient->request('POST', $this->url, [
-                'json' => $payload, // symfony sam konwertuje na jsona
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
-                    'Content-Length: ' . strlen(json_encode($payload)),
-                    'Authorization' => 'Bearer ' . $this->config->get('API_KEY_OPENAI')
-                ]
-            ]);
+            $response = $this->httpClient->request(
+                'POST',
+                $this->url,
+                    [
+                        'json' => $payload, // symfony sam konwertuje na jsona
+                        'headers' => [
+                            'Content-Type' => 'application/json',
+                            'Accept' => 'application/json',
+                            'Content-Length: ' . strlen(json_encode($payload)),
+                            'Authorization' => 'Bearer ' . $this->config->get('API_KEY_OPENAI')
+                        ]
+                    ]
+                );
 
             //dd($response->getContent(false));
             $response = json_decode($response->getContent(false))->choices[0]->message->content;
@@ -72,6 +76,44 @@ class GPTservice
         }
 
         return $response;
+    }
+
+    function makeEmbeding($input): array
+    {
+        $payload = [
+            'model' => 'text-embedding-ada-002',
+            'encoding_format' => 'float',
+            'input' => json_encode($input)
+        ];
+
+        try {
+
+            $request = $this->httpClient->request(
+                'POST',
+                'https://api.openai.com/v1/embeddings',
+                [
+                    'body' => $payload,
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Accept' => 'application/json',
+                        'Content-Length: ' . strlen(json_encode($payload)),
+                        'Authorization' => 'Bearer ' . $this->config->get('API_KEY_OPENAI')
+                    ]
+                ]
+
+            );
+
+            $response = json_decode($request->getContent(false))->data[0]->embedding;;
+
+        } catch (ClientException $exception) {
+            $response = $exception->getMessage();
+        }  catch (HttpExceptionInterface $exception) {
+            $response = $exception->getMessage();
+        } catch (\Exception $exception) {
+            $response = 'Unexpected error: ' . $exception->getMessage();
+        } 
+
+        return (array) $response;
     }
 
     public function getChatModels()

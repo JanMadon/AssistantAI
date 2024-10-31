@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
+//todo tutaj trzeba bedzie skorzystać z jakiegoś wyszykianiea artykułów po frazeie wjęzyku naturalnym
+// prawdopodobnie skorzytam z własnej instacji N8N i z ich integracji   
 class WikipediaController extends AbstractController
 {
     private string $token;
