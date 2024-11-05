@@ -4,25 +4,44 @@
 
 {% block body %}
     <a href="?" class="btn btn-warning">CLEAR</a>
-    <div class="row">
-        <div class="col-3 m-5">
+    <div class="row m-1">
+        <div class="col-3 m-1">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Poligon test</h5>
-{#                    <p class="card-text">starts session.</p>#}
                     <a href="?task=poligon" class="btn btn-primary">Get first task</a>
                 </div>
             </div>
         </div>
+        <div class="col-3 m-1">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Logowanie</h5>
+                    <a href="?task=login" class="btn btn-primary">Get first task</a>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="row">
+    <div class="row mx-5">
         {% if result ?? null %}
-        <div class="m-5 text-info">
-            <p>task name: {{ result.task }}</p>
-            <p>response code: {{ result.code }}</p>
-            <p>api code: {{ result.data.code }}</p>
-            <p>api massage: {{ result.data.message }} </p>
-        <div>
+            <div class="m-5 text-info">
+                <p>task name: {{ result.task }}</p>
+                <p>response code: {{ result.code }}</p>
+                <p>api code: {{ result.data.code }}</p>
+                <p>api massage: {{ result.data.message }} </p>
+            </div>
+        {% endif %}
+
+        {% if html  %}
+            <p> question: {{ question }}</p>
+            <p> answer: {{ answer}} </p>
+
+            Response HTML
+            <div class="border border-danger m-1">
+
+                {{ html|raw }}
+
+            </div>
         {% endif %}
     </div>
 

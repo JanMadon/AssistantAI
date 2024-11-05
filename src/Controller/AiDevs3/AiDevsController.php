@@ -3,13 +3,11 @@
 namespace App\Controller\AiDevs3;
 
 use App\Service\Aidev3\AiDev3PreWorkService;
+use App\Service\GPTservice;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class AiDevsController extends AbstractController
@@ -18,16 +16,19 @@ class AiDevsController extends AbstractController
     private ParameterBagInterface $config;
     private HttpClientInterface $httpClient;
     private AiDev3PreWorkService $aiDevsService;
+    private GPTservice $gptService;
 
     public function __construct(
         ParameterBagInterface $config,
         HttpClientInterface   $httpClient,
-        AiDev3PreWorkService  $aiDevsService
+        AiDev3PreWorkService  $aiDevsService,
+        GPTservice $gptService
     )
     {
         $this->config = $config;
         $this->httpClient = $httpClient;
         $this->aiDevsService = $aiDevsService;
+        $this->gptService = $gptService;
     }
 
     #[Route('/aidevs', name: 'aidevs3_prework_main', methods: ['GET'])]
@@ -43,6 +44,10 @@ class AiDevsController extends AbstractController
                     'data' => $result['data'] ?? [],
                     'error' => $result['error'] ?? [],
                 ];
+                break;
+
+            case 'login':
+                $data = $this->aiDevsService->login();
                 break;
             default:
 
