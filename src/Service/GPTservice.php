@@ -2,18 +2,12 @@
 
 namespace App\Service;
 
-use Couchbase\HttpException;
-use phpDocumentor\Reflection\Types\This;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpClient\Exception\ClientException;
-use Symfony\Component\HttpKernel\Exception\HttpException as SymfonyHttpException;
-
-;
-
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+
 
 class GPTservice
 {
@@ -31,7 +25,7 @@ class GPTservice
         $this->httpClient = $httpClient;
     }
 
-    public function prompt(string $system, array $contents, string $model = 'gpt-3.5-turbo', $config = [])
+    public function prompt(string $system, array|string $contents, string $model = 'gpt-3.5-turbo', $config = '')
     {
         $contents = $this->prepareConversationArray($contents);
 
@@ -141,11 +135,17 @@ class GPTservice
         return $response->data ?? null;
     }
 
-    private function prepareConversationArray(array $conversation): array
+    private function prepareConversationArray(array|string $conversation): array
     {
+        if(is_string($conversation)){
+            return [[
+                'role'=>'user',
+                'content'=> $conversation
+            ]];
+        }
+
         $preparedConversation = [];
         foreach ($conversation as $messages) {
-            //dd();
 
             if (property_exists($messages, 'User')) {
                 $preparedConversation[] = [
