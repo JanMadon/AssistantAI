@@ -16,7 +16,7 @@ parameters:
     WIKI_API_TOKEN: '%env(WIKI_API_TOKEN)%'
     AI3_ENDPOINTS:
         S1E1_LOGIN: '%env(S1E1_LOGIN)%'
-
+        S1E2_AUTH: '%env(S1E2_AUTH)%'
 
 
 

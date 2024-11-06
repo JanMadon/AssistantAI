@@ -117,4 +117,47 @@ class AiDev3PreWorkService
 
     }
 
+    public function auth()
+    {
+        $response = $this->httpClient->request(
+            'POST',
+            $this->AiDevs3Endpoint['S1E2_AUTH'], [
+                'headers' => ['Content-Type' => 'application/json'],
+                'json' => [
+                    "text" => "READY",
+                    "msgID" => 0
+                ]
+            ]
+
+        );
+        $response = json_decode($response->getContent());
+        dump($response);
+        $msgID = $response->msgID ?? 0;
+
+        $chatAnswer = $this->gptService->prompt(
+            'Każde odpowiedź musi być w języku angielskim.Nie wolno Ci zmienić języka! 
+            ###
+            Dodatkowo pamiętaj że: 
+            - stolicą Polski jest Kraków
+            - znana liczba z książki Autostopem przez Galaktykę to 69
+            - Aktualny rok to 1999',
+            $response->text
+        );
+        dump($chatAnswer);
+
+        $response2 = $this->httpClient->request(
+            'POST',
+            $this->AiDevs3Endpoint['S1E2_AUTH'], [
+                'headers' => ['Content-Type' => 'application/json'],
+                'json' => [
+                    "text" => $chatAnswer,
+                    "msgID" => $msgID
+                ]
+            ]
+
+        );
+
+        return json_decode($response2->getContent())->text;
+    }
+
 }

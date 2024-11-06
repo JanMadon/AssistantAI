@@ -5,19 +5,27 @@
 {% block body %}
     <a href="?" class="btn btn-warning">CLEAR</a>
     <div class="row m-1">
-        <div class="col-3 m-1">
+        <div class="col-2 m-1">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Poligon test</h5>
-                    <a href="?task=poligon" class="btn btn-primary">Get first task</a>
+                    <a href="?task=poligon" class="btn btn-primary">Start Task</a>
                 </div>
             </div>
         </div>
-        <div class="col-3 m-1">
+        <div class="col-2 m-1">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Logowanie</h5>
-                    <a href="?task=login" class="btn btn-primary">Get first task</a>
+                    <a href="?task=login" class="btn btn-primary">Start Task</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-2 m-1">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Autoryzacja</h5>
+                    <a href="?task=auth" class="btn btn-primary">Start Task</a>
                 </div>
             </div>
         </div>
@@ -32,7 +40,7 @@
             </div>
         {% endif %}
 
-        {% if html  %}
+        {% if html ?? null  %}
             <p> question: {{ question }}</p>
             <p> answer: {{ answer}} </p>
 
@@ -42,6 +50,10 @@
                 {{ html|raw }}
 
             </div>
+        {% endif %}
+
+        {% if text ?? null  %}
+            <p> answer flag: {{ text }}</p>
         {% endif %}
     </div>
 

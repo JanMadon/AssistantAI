@@ -49,6 +49,11 @@ class AiDevsController extends AbstractController
             case 'login':
                 $data = $this->aiDevsService->login();
                 break;
+
+            case 'auth':
+                $data['text'] = $this->aiDevsService->auth();
+                break;
+
             default:
 
         }
