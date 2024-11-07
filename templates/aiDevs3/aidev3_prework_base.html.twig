@@ -29,6 +29,14 @@
                 </div>
             </div>
         </div>
+        <div class="col-2 m-1">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Sprawdź i popraw dane</h5>
+                    <a href="?task=checkData" class="btn btn-primary">Start Task</a>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="row mx-5">
         {% if result ?? null %}
@@ -56,5 +64,8 @@
             <p> answer flag: {{ text }}</p>
         {% endif %}
     </div>
+    <pre>
+        {{ dump(rawData) }}
+    </pre>
 
 {% endblock %}

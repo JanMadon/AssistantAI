@@ -6,6 +6,7 @@ use App\Service\Aidev3\AiDev3PreWorkService;
 use App\Service\GPTservice;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -22,7 +23,7 @@ class AiDevsController extends AbstractController
         ParameterBagInterface $config,
         HttpClientInterface   $httpClient,
         AiDev3PreWorkService  $aiDevsService,
-        GPTservice $gptService
+        GPTservice            $gptService
     )
     {
         $this->config = $config;
@@ -52,6 +53,10 @@ class AiDevsController extends AbstractController
 
             case 'auth':
                 $data['text'] = $this->aiDevsService->auth();
+                break;
+
+            case 'checkData':
+                $data['rawData'] = $this->aiDevsService->checkAndImprovedData();
                 break;
 
             default:

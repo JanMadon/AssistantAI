@@ -7,6 +7,8 @@ namespace App\Service\Aidev3;
 
 use App\Service\GPTservice;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
@@ -15,23 +17,29 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use DOMDocument;
 
 
-
 class AiDev3PreWorkService
 {
     private ParameterBagInterface $config;
     private HttpClientInterface $httpClient;
     private GPTservice $gptService;
     private array $AiDevs3Endpoint;
+    private CacheInterface $cache;
 
-    public function __construct(ParameterBagInterface $config, HttpClientInterface $httpClient, GPTservice $gptService)
+    public function __construct(
+        ParameterBagInterface $config,
+        HttpClientInterface   $httpClient,
+        GPTservice            $gptService,
+        CacheInterface        $cache
+    )
     {
         $this->config = $config;
         $this->httpClient = $httpClient;
         $this->gptService = $gptService;
         $this->AiDevs3Endpoint = $config->get('AI3_ENDPOINTS');
+        $this->cache = $cache;
     }
 
-    private function answerToAiDevs(string $taskName, array $response): array
+    private function answerToAiDevs(string $taskName, $response, $url = 'https://poligon.aidevs.pl/verify'): array
     {
         $payload = [
             'task' => $taskName,
@@ -41,7 +49,7 @@ class AiDev3PreWorkService
 
         $result = $this->httpClient->request(
             'POST',
-            'https://poligon.aidevs.pl/verify',
+            $url,
             [
                 'headers' => [
                     'Accept' => 'application/json',
@@ -88,7 +96,7 @@ class AiDev3PreWorkService
     public function login()
     {
         // todo obsługa błędów http
-        $htmlDomContent = $this->httpClient->request('GET',$this->AiDevs3Endpoint['S1E1_LOGIN'])->getContent();
+        $htmlDomContent = $this->httpClient->request('GET', $this->AiDevs3Endpoint['S1E1_LOGIN'])->getContent();
 
         $dom = new DOMDocument();
         $dom->loadHTML($htmlDomContent);
@@ -107,7 +115,7 @@ class AiDev3PreWorkService
             'body' => [
                 'username' => 'tester',
                 'password' => '574e112a',
-                'answer' => (int) $answer,
+                'answer' => (int)$answer,
             ]
         ],
         );
@@ -164,6 +172,37 @@ class AiDev3PreWorkService
         );
 
         return json_decode($response2->getContent())->text;
+    }
+
+
+    public function checkAndImprovedData()
+    {
+        //$rawData = file_get_contents('https://centrala.ag3nts.org/data/af693b93-4488-4f7a-811e-c0910ac17ba4/json.txt');
+        //$rawData = $this->httpClient->request('GET', 'https://centrala.ag3nts.org/data/af693b93-4488-4f7a-811e-c0910ac17ba4/json.txt');
+        //$rawData =$rawData->getContent(false);
+        //$this->cache->clear();
+        $rawData = $this->cache->get('rawData', function () {
+            $request = $this->httpClient->request('GET', $this->AiDevs3Endpoint['S1E3_CHECK_DATA']);
+            return json_decode($request->getContent());
+        });
+
+
+        foreach ($rawData->{'test-data'} as &$data) {
+            $data->answer = eval("return $data->question ;");
+            if (isset($data->test)) {
+                $gptAnswer = $this->gptService->prompt(
+                    'Odpowiedz krótko na pytanie',
+                    $data->test->q
+                );
+                dump($gptAnswer);
+                $data->test->a = $gptAnswer;
+            }
+        }
+        $rawData->apikey = $this->config->get('API_KEY_AIDEVS');
+
+        dd($this->answerToAiDevs('JSON', $rawData, 'https://centrala.ag3nts.org/report'));
+
+        return $rawData;
     }
 
 }
