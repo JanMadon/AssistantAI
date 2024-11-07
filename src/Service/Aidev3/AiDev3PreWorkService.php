@@ -31,6 +31,32 @@ class AiDev3PreWorkService
         $this->AiDevs3Endpoint = $config->get('AI3_ENDPOINTS');
     }
 
+    private function answerToAiDevs(string $taskName, array $response): array
+    {
+        $payload = [
+            'task' => $taskName,
+            'apikey' => $this->config->get('API_KEY_AIDEVS'),
+            'answer' => $response,
+        ];
+
+        $result = $this->httpClient->request(
+            'POST',
+            'https://poligon.aidevs.pl/verify',
+            [
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                ],
+                'body' => json_encode($payload)
+            ]
+        );
+
+        return [
+            'server-code' => $result->getStatusCode(),
+            'data' => json_decode($result->getContent(false)),
+        ];
+    }
+
     public function poligon(): array
     {
         try {
@@ -45,28 +71,8 @@ class AiDev3PreWorkService
             );
             $response = array_filter(explode("\n", $response->getContent()));
 
-            $payload = [
-                'task' => 'POLIGON',
-                'apikey' => $this->config->get('API_KEY_AIDEVS'),
-                'answer' => $response,
-            ];
+            return $this->answerToAiDevs('POLIGON', $response);
 
-            $result = $this->httpClient->request(
-                'POST',
-                'https://poligon.aidevs.pl/verify',
-                [
-                    'headers' => [
-                        'Accept' => 'application/json',
-                        'Content-Type' => 'application/json',
-                    ],
-                    'body' => json_encode($payload)
-                ]
-            );
-
-            return [
-                'server-code' => $result->getStatusCode(),
-                'data' => json_decode($result->getContent(false)),
-            ];
         } catch (
         RedirectionExceptionInterface|
         ClientExceptionInterface|
