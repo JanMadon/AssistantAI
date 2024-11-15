@@ -177,10 +177,6 @@ class AiDev3PreWorkService
 
     public function checkAndImprovedData()
     {
-        //$rawData = file_get_contents('https://centrala.ag3nts.org/data/af693b93-4488-4f7a-811e-c0910ac17ba4/json.txt');
-        //$rawData = $this->httpClient->request('GET', 'https://centrala.ag3nts.org/data/af693b93-4488-4f7a-811e-c0910ac17ba4/json.txt');
-        //$rawData =$rawData->getContent(false);
-        //$this->cache->clear();
         $rawData = $this->cache->get('rawData', function () {
             $request = $this->httpClient->request('GET', $this->AiDevs3Endpoint['S1E3_CHECK_DATA']);
             return json_decode($request->getContent());
