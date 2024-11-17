@@ -59,6 +59,10 @@ class AiDevsController extends AbstractController
                 $data['rawData'] = $this->aiDevsService->checkAndImprovedData();
                 break;
 
+            case 'personalData':
+                $data['rawData'] = $this->aiDevsService->hidePersonalData();
+                break;
+
             default:
 
         }

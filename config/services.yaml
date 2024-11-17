@@ -18,6 +18,7 @@ parameters:
         S1E1_LOGIN: '%env(S1E1_LOGIN)%'
         S1E2_AUTH: '%env(S1E2_AUTH)%'
         S1E3_CHECK_DATA: '%env(S1E3_CHECK_DATA)%'
+        S1E5_PERSONAL_DATA: '%env(S1E5_PERSONAL_DATA)%'
 
 
 

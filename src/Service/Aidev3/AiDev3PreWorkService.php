@@ -201,4 +201,21 @@ class AiDev3PreWorkService
         return $rawData;
     }
 
+    public function hidePersonalData()
+    {
+        $rawData = $this->httpClient->request('GET', $this->AiDevs3Endpoint['S1E5_PERSONAL_DATA']);
+        $rawData = $rawData->getContent();
+
+        $gptAnswer = $this->gptService->prompt(
+            'Zamień wszelkie wrażliwe dane (imię + nazwisko, nazwę ulicy + numer, miasto, wiek osoby na słowo CENZURA',
+            $rawData,
+            'gpt-4'
+        );
+        dump($gptAnswer);
+
+        $result = $this->answerToAiDevs('CENZURA', $gptAnswer, 'https://centrala.ag3nts.org/report');
+
+        return $result;
+    }
+
 }

@@ -37,6 +37,14 @@
                 </div>
             </div>
         </div>
+        <div class="col-2 m-1">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Dane osobowe</h5>
+                    <a href="?task=personalData" class="btn btn-primary">Start Task</a>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="row mx-5">
         {% if result ?? null %}
@@ -65,7 +73,7 @@
         {% endif %}
     </div>
     <pre>
-        {{ dump(rawData) }}
+{#        {{ dump(rawData) }}#}
     </pre>
 
 {% endblock %}
