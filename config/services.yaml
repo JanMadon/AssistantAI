@@ -15,6 +15,7 @@ parameters:
     WIKI_SECRET_CLIENT: '%env(WIKI_SECRET_CLIENT)%'
     WIKI_API_TOKEN: '%env(WIKI_API_TOKEN)%'
     AI3_ENDPOINTS:
+        REPORT_URL: '%env(REPORT_URL)%'
         S1E1_LOGIN: '%env(S1E1_LOGIN)%'
         S1E2_AUTH: '%env(S1E2_AUTH)%'
         S1E3_CHECK_DATA: '%env(S1E3_CHECK_DATA)%'

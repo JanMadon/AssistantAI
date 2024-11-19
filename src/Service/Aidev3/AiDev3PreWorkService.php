@@ -39,7 +39,7 @@ class AiDev3PreWorkService
         $this->cache = $cache;
     }
 
-    private function answerToAiDevs(string $taskName, $response, $url = 'https://poligon.aidevs.pl/verify'): array
+    public function answerToAiDevs(string $taskName, $response, $url): array
     {
         $payload = [
             'task' => $taskName,
@@ -217,5 +217,6 @@ class AiDev3PreWorkService
 
         return $result;
     }
+
 
 }

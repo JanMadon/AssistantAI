@@ -4,7 +4,10 @@ namespace App\Service;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpClient\Exception\ClientException;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -72,6 +75,30 @@ class GPTservice
         return $response;
     }
 
+    public function makeTranscription(string $filePath): string
+    {
+        try{
+            $response = $this->httpClient->request(
+                'POST',
+                'https://api.openai.com/v1/audio/transcriptions',
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->config->get('API_KEY_OPENAI'),
+                        'Content-Type' => ' multipart/form-data'
+                    ],
+                    'body' => [
+                        'file' => fopen($filePath, 'r'),
+                        'model' => 'whisper-1'
+                    ]
+                ]
+
+            );
+            $response = $response->getContent(false);
+        } catch (ClientExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $e) {
+            $response = $e->getMessage();
+        }
+        return $response;
+    }
     function makeEmbeding($input): array
     {
         $payload = [

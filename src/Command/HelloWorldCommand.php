@@ -8,6 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
+//php bin/console app:hello-world <- to run i CLI
 class HelloWorldCommand extends Command
 {
 // Ustawienie nazwy komendy
