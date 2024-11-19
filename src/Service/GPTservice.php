@@ -99,6 +99,38 @@ class GPTservice
         }
         return $response;
     }
+
+    public function imageGeneration($prompt)
+    {
+        $payload = [
+            'model'=>'dall-e-3',
+            'prompt'=>$prompt,
+            'n' => 1,
+            'size' => '1024x1024' // 1024x1024, 1024x1792 or 1792x1024
+        ];
+
+        try{
+            $response = $this->httpClient->request(
+                'POST',
+                'https://api.openai.com/v1/images/generations',
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->config->get('API_KEY_OPENAI'),
+                        'Content-Type' => 'application/json'
+                    ],
+                    'json' => $payload
+                ]
+
+            );
+            $response = $response->getContent(false);
+        } catch (ClientExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $e) {
+            $response = $e->getMessage();
+        }
+        return json_decode($response)->data[0]->url;
+    }
+
+
+
     function makeEmbeding($input): array
     {
         $payload = [
