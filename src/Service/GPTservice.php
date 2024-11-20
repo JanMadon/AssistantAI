@@ -75,6 +75,53 @@ class GPTservice
         return $response;
     }
 
+    public function promptImage(string $prompt, string $imagePath, string $model = 'gpt-4o-mini')
+    {
+        $payload = [
+            'model' => $model,
+            'messages' => [
+                [
+                    'role' => 'user',
+                    'content' => [
+                        [
+                            "type" => "text",
+                            "text" => $prompt
+                        ],
+                        [
+                            "type" => "image_url",
+                            "image_url" => [ "url" => "data:image/jpeg;base64," . base64_encode($imagePath) ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        try {
+            $response = $this->httpClient->request(
+                'POST',
+                $this->url,
+                [
+                    'json' => $payload,
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Accept' => 'application/json',
+                        'Content-Length: ' . strlen(json_encode($payload)),
+                        'Authorization' => 'Bearer ' . $this->config->get('API_KEY_OPENAI')
+                    ]
+                ]
+            );
+            $response = json_decode($response->getContent(false))->choices[0]->message->content;
+        } catch (ClientException $exception) {
+            $response = $exception->getMessage();
+        }  catch (HttpExceptionInterface $exception) {
+            $response = $exception->getMessage();
+        } catch (\Exception $exception) {
+            $response = 'Unexpected error: ' . $exception->getMessage();
+        }
+
+        return $response;
+    }
+
     public function makeTranscription(string $filePath): string
     {
         try{
@@ -99,6 +146,8 @@ class GPTservice
         }
         return $response;
     }
+
+
 
     public function imageGeneration($prompt)
     {
