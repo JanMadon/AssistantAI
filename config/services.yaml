@@ -21,6 +21,7 @@ parameters:
         S1E3_CHECK_DATA: '%env(S1E3_CHECK_DATA)%'
         S1E5_PERSONAL_DATA: '%env(S1E5_PERSONAL_DATA)%'
         S2E3_IMAGE_DESCRIPTION: '%env(S2E3_IMAGE_DESCRIPTION)%'
+        S2E5_HTML_DATA: '%env(S2E5_HTML_DATA)%'
 
 
 services:
