@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Contracts\Cache\CacheInterface;
 
 #[AsCommand(name: 'app:S2e5Command',description: 'Add a short description for your command')]
 class S2e5Command extends BaseCommand
@@ -23,19 +24,73 @@ class S2e5Command extends BaseCommand
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int
     {
 
-        try {
-            $response = $this->httpClient->request(
-                'GET',
-                $this->aiDevs3Endpoint['S2E5_HTML_DATA']
-            );
-            $domHtml = $response->getContent(false);
-        } catch (\Throwable $e) {
-            print_r($e->getMessage());
-            return Command::FAILURE;
+        $html = <<<HTML
+                    <html>
+                        <body>
+                            <div class="gallery">
+                                <img src="image1.jpg" alt="First image">
+                                <img src="image2.jpg" alt="Second image">
+                            </div>
+                        </body>
+                    </html>
+                    HTML;
+        // Tworzymy Crawler
+        $crawler = new Crawler($html);
+
+        // Konwertujemy HTML do DOMDocument (aby można było go edytować)
+        $domDocument = new \DOMDocument();
+        @$domDocument->loadHTML($crawler->html());
+
+        // Pobieramy wszystkie obrazki w galerii
+        $xpath = new \DOMXPath($domDocument);
+        $images = $xpath->query('//div[@class="gallery"]/img');
+        //print_r($images);
+        //dd($images);
+
+        // Dodajemy opis pod każdym obrazkiem
+        foreach ($images as $image) {
+            // Tworzymy element <figcaption>
+            $figcaption = $domDocument->createElement('figcaption', 'Opis obrazu: ' . $image->getAttribute('alt'));
+
+            // Tworzymy kontener <figure> i dodajemy do niego obrazek i opis
+            $figure = $domDocument->createElement('figure');
+            $imageClone = $image->cloneNode(true); // Klonujemy obrazek
+            $figure->appendChild($imageClone);
+            $figure->appendChild($figcaption);
+
+            // Zamieniamy oryginalny obrazek na kontener <figure>
+            $image->parentNode->replaceChild($figure, $image);
         }
+        dd($domDocument->saveHTML());
+
+
+
+
+        $domHtml = $this->cache->get('domHtml', function(){
+            return $this->getHtmlContent();
+        });
+        /** add transcription bootom mp3 player */
+        $domDocument = new \DOMDocument();
+        @$domDocument->loadHTML($domHtml);
+        $xpath = new \DOMXPath($domDocument);
+        //$images = $xpath->query('//div[@class="gallery"]/img');
+        $images = $xpath->query('//h2');
+        print_r($images);
+        dd($images);
+
+
+        $content = $crawler->filter('div.container')->html();
+        dd($mp3_records_full_urls);
+
+
+        dd($domHtml);
+
 
         $crawler = new Crawler($domHtml);
         $mainContainerHtml = $crawler->filter('div.container')->html();
@@ -72,7 +127,10 @@ class S2e5Command extends BaseCommand
         /** add transcription bootom mp3 player */
         $domDocument = new \DOMDocument();
         @$domDocument->loadHTML($mainContainerHtml);
-        dd($domDocument);
+        $xpath = new \DOMXPath($domDocument);
+        //$images = $xpath->query('//div[@class="gallery"]/img');
+        $images = $xpath->query('/audio');
+        dd($images);
 
 
         $content = $crawler->filter('div.container')->html();
@@ -84,5 +142,20 @@ class S2e5Command extends BaseCommand
 
 
         return Command::SUCCESS;
+    }
+
+    private function getHtmlContent():string
+    {
+        try {
+            $response = $this->httpClient->request(
+                'GET',
+                $this->aiDevs3Endpoint['S2E5_HTML_DATA']
+            );
+            $domHtml = $response->getContent(false);
+        } catch (\Throwable $e) {
+            print_r($e->getMessage());
+            return Command::FAILURE;
+        }
+        return $domHtml;
     }
 }
