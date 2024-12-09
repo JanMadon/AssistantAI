@@ -8,6 +8,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -29,6 +30,7 @@ class S2e5Command extends BaseCommand
         OutputInterface $output,
     ): int
     {
+
 
         $html = <<<HTML
                     <html>
@@ -59,31 +61,30 @@ class S2e5Command extends BaseCommand
             $figcaption = $domDocument->createElement('figcaption', 'Opis obrazu: ' . $image->getAttribute('alt'));
 
             // Tworzymy kontener <figure> i dodajemy do niego obrazek i opis
-            $figure = $domDocument->createElement('figure');
-            $imageClone = $image->cloneNode(true); // Klonujemy obrazek
-            $figure->appendChild($imageClone);
-            $figure->appendChild($figcaption);
+            //$figure = $domDocument->createElement('figure');
+            //$imageClone = $image->cloneNode(true); // Klonujemy obrazek
+            //$figure->appendChild($imageClone);
+            //$figure->appendChild($figcaption);
 
             // Zamieniamy oryginalny obrazek na kontener <figure>
-            $image->parentNode->replaceChild($figure, $image);
+           // $image->parentNode->replaceChild($figcaption, $image);
+             $image->appendChild($figcaption);
         }
         dd($domDocument->saveHTML());
 
-
-
-
-        $domHtml = $this->cache->get('domHtml', function(){
+        $domHtml = $this->cache->get('domHtml', function() use ($input, $output) {
+            $output->writeln('pobrano kontent');
             return $this->getHtmlContent();
         });
         /** add transcription bootom mp3 player */
         $domDocument = new \DOMDocument();
         @$domDocument->loadHTML($domHtml);
         $xpath = new \DOMXPath($domDocument);
-        //$images = $xpath->query('//div[@class="gallery"]/img');
-        $images = $xpath->query('//h2');
-        print_r($images);
-        dd($images);
+        $audioTags = $xpath->query('//audio');
 
+        foreach ($audioTags as $audioTag) {
+            $audio = $domDocument->createElement('transcription');
+        }
 
         $content = $crawler->filter('div.container')->html();
         dd($mp3_records_full_urls);
