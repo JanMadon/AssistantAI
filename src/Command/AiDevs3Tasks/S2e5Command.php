@@ -17,6 +17,30 @@ use Symfony\Contracts\Cache\CacheInterface;
 class S2e5Command extends BaseCommand
 {
 
+    /**
+     * @param array $mp3_records_full_urls
+     * @param $mp3_records_urls
+     * @return mixed
+     */
+    private function saveAndGetTranscriptions(array $mp3_records_full_urls, $mp3_records_urls): mixed
+    {
+        if (!file_exists('var/AiDev3_data/audioS2E5/transcription.txt')) {
+            foreach ($mp3_records_full_urls as $record_url) {
+                $record = file_get_contents(str_replace('/arxiv-draft.html', '', $record_url));
+                $result = file_put_contents(
+                    $savePath = 'var/AiDev3_data/audioS2E5/' . explode('/', $mp3_records_urls)[1],
+                    $record
+                );
+            }
+            $transcription = $this->GPTservice->makeTranscription($savePath);
+            // REMEMBER: if use file_put_contents, you need use exist patch (exist directory)
+            file_put_contents('var/AiDev3_data/audioS2E5/transcription.txt', $transcription);
+        }
+
+        return json_decode(file_get_contents('var/AiDev3_data/audioS2E5/transcription.txt'))->text ?? '';
+
+    }
+
     protected function configure(): void
     {
         $this
