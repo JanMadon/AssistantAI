@@ -28,6 +28,16 @@ class GPTservice
         $this->httpClient = $httpClient;
     }
 
+    public function simplePrompt(array $messages, string $model = 'gpt-4o-mini')
+    {
+        $payload = [
+            'model' => $model,
+            'messages' => $messages
+        ];
+
+        return $this->gptRequest($payload);
+    }
+
     public function prompt(string $system, array|string $contents, string $model = 'gpt-3.5-turbo', $config = '')
     {
         $contents = $this->prepareConversationArray($contents);
