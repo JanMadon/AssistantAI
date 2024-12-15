@@ -47,32 +47,18 @@ class GPTservice
             $payload['temperature'] = (float) $config->temperature;
         }
 
-        try {
-            $response = $this->httpClient->request(
-                'POST',
-                $this->url,
-                    [
-                        'json' => $payload, // symfony sam konwertuje na jsona
-                        'headers' => [
-                            'Content-Type' => 'application/json',
-                            'Accept' => 'application/json',
-                            'Content-Length: ' . strlen(json_encode($payload)),
-                            'Authorization' => 'Bearer ' . $this->config->get('API_KEY_OPENAI')
-                        ]
-                    ]
-                );
+        return $this->gptRequest($payload);
+    }
 
-            //dd($response->getContent(false));
-            $response = json_decode($response->getContent(false))->choices[0]->message->content;
-        } catch (ClientException $exception) {
-            $response = $exception->getMessage();
-        }  catch (HttpExceptionInterface $exception) {
-            $response = $exception->getMessage();
-        } catch (\Exception $exception) {
-            $response = 'Unexpected error: ' . $exception->getMessage();
-        }
+    public function promptVisionModel(array $messages, string $model)
+    {
+        $payload = [
+            'model' => $model,
+            'messages' => $messages
+        ];
+        //dd(json_encode($payload));
 
-        return $response;
+        return $this->gptRequest($payload);
     }
 
     public function promptImage(string $prompt, string $imagePath, string $model = 'gpt-4o-mini')
@@ -96,30 +82,7 @@ class GPTservice
             ]
         ];
 
-        try {
-            $response = $this->httpClient->request(
-                'POST',
-                $this->url,
-                [
-                    'json' => $payload,
-                    'headers' => [
-                        'Content-Type' => 'application/json',
-                        'Accept' => 'application/json',
-                        'Content-Length: ' . strlen(json_encode($payload)),
-                        'Authorization' => 'Bearer ' . $this->config->get('API_KEY_OPENAI')
-                    ]
-                ]
-            );
-            $response = json_decode($response->getContent(false))->choices[0]->message->content;
-        } catch (ClientException $exception) {
-            $response = $exception->getMessage();
-        }  catch (HttpExceptionInterface $exception) {
-            $response = $exception->getMessage();
-        } catch (\Exception $exception) {
-            $response = 'Unexpected error: ' . $exception->getMessage();
-        }
-
-        return $response;
+        return $this->gptRequest($payload);
     }
 
     public function makeTranscription(string $filePath): string
@@ -270,6 +233,39 @@ class GPTservice
         }
 
         return $preparedConversation;
+    }
+
+    /**
+     * @param array $payload
+     * @return string
+     * @throws TransportExceptionInterface
+     */
+    public function gptRequest(array $payload): string
+    {
+        try {
+            $response = $this->httpClient->request(
+                'POST',
+                $this->url,
+                [
+                    'json' => $payload,
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Accept' => 'application/json',
+                        'Content-Length: ' . strlen(json_encode($payload)),
+                        'Authorization' => 'Bearer ' . $this->config->get('API_KEY_OPENAI')
+                    ]
+                ]
+            );
+            $response = json_decode($response->getContent(false))->choices[0]->message->content;
+        } catch (ClientException $exception) {
+            $response = $exception->getMessage();
+        } catch (HttpExceptionInterface $exception) {
+            $response = $exception->getMessage();
+        } catch (\Exception $exception) {
+            $response = 'Unexpected error: ' . $exception->getMessage();
+        }
+
+        return $response;
     }
 
 }
