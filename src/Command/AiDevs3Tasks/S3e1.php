@@ -27,86 +27,75 @@ class S3e1 extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        /*
+        $prompts_directory = 'Prompts/AiDev3/S3E1';
+        $system = file_get_contents($prompts_directory.'/simple2.txt');
+
         $directory_facts = 'var/AiDev3_data/S3E1/pliki_z_fabryki/facts';
         $files_facts = glob($directory_facts . '/*.txt',);
 
-        $content_facts['facts'] = array_map(function ($file) {
-            return [
-                'file_facts_name' => basename($file),
-                'content' => file_get_contents($file)
-            ];
+        $content_facts = array_map(function ($file) {
+            //return [
+                //'file_facts_name' => basename($file),
+                //'content' => file_get_contents($file)
+                //basename($file) => file_get_contents($file),
+            //];
+            return file_get_contents($file);
         }, $files_facts);
 
         $directory_documents = 'var/AiDev3_data/S3E1/pliki_z_fabryki';
         $files_documents = glob($directory_documents . '/*.txt',);
 
-        $content_documents['documents'] = array_map(function ($file) {
+        $content_documents = array_map(function ($file) {
             return [
                 'file_documents_name' => basename($file),
-                'content' => file_get_contents($file)
+                'content_document' => file_get_contents($file)
             ];
         }, $files_documents);
 
-        //dd(json_encode(array_merge($content_facts, $content_documents)));
-        $system = 'Do każdego z 10 dokumentów wygeneruj słowa kluczowe w formie mianownika (czyli np. “sportowiec”, a nie “sportowcem”, “sportowców” itp.)
-        Przy generowaniu metadanych posiłkuj się całą posiadaną wiedzą (czyli także plikami z faktami - facts) 
-        ale słowa kluczowe generujesz tylko dla dokumentów.
-        <exampleResponse>
+        $answers = [];
+        foreach ($content_documents as &$content_document)
         {
-            "nazwa-pliku-01.txt":"lista, słów, kluczowych 1",
-            "nazwa-pliku-02.txt":"lista, słów, kluczowych 2",
-            "nazwa-pliku-03.txt":"lista, słów, kluczowych 3",
-            "nazwa-pliku-NN.txt":"lista, słów, kluczowych N"
+            $content_document['facts'] = $content_facts;
+            $messages = [
+                [
+                    'role' => 'system',
+                    'content' => $system
+                ],
+                [
+                    'role' => 'user',
+                    'content' => json_encode($content_document)
+                ]
+            ];;
+
+            //$temp = $this->GPTservice->simplePrompt($messages, 'gpt-4o-mini');
+            //dump($temp);
+            //$answers[] = $temp;
         }
-         </exampleResponse>
-         
-         Słowa kluczowe są walidowane przez zewnętrzny system w przypadku błędu zwrócę błąd do ciebie i proszę o ponowne generowanie słów
-         <errors>
-         we cannot find a report on the capture of a teacher
-         </errors>
-        ';
+        */
 
-        $system = 'Twoim zadaniem jest stworzenie listy słów kluczowych (w formie mianownika) na podstawie podanego przez użytkownika raportu.
-        Na potrzeby poprawnego rozumienia treści raportów otrzymujesz poniższy konktest zawierający dodatkowe fakty oraz inne raporty:
-         === KONTEKST ==='.
-        json_encode(array_merge($content_documents, $content_facts))
-         . '=== KONIEC KONTEKSTU === 
-        Skup się na podanym raporcie i wygeneruj odpowiedź podając 10 słów kluczowych po przecinku.
-        Dobrze wykorzystaj konteks aby wygenerować maksymanie precyzyjne słowa kluczowe  Naprzkład jeśli w mowa o osobie która jest wspominana w faktach, wykorzystaj wiedzę z faktów by stworzyć precyzyjne słowa kluczowe. Gdy pojawiają się nazyw własne, nazwiska - kluczowe informacje o tych osobach lub rzeczach (znajdujące się w faktach) powinny być zawarte w słowach kluczowych.
-        Struktura odpowiedzi:
-        {{
-         "przemyślenia": "Podsumuj informacje z Raportu. Zastanów się jakie Fakty stanowią kontekst dla Raportu.",
-         "refleksja-nazwy": "Czy w raporice padają nazwy własne? Korzystając z faktów jak mogę pogłębić moje słowa kluczowe?",
-         "kluczowe-fakty": "Jakie informacje z FAKTÓW wzbogacają treść raportu?",
-         "słowa-kluczowe": "10 słów kluczowych uwzględniających informacje z Raportu i Faktów"
-        }}
-        PRZYKŁAD:
-        RAPORT:
-        "Patrol Odnalazł Alicję AFD-1234 w stanie krytycznym w sektorze C4"
-        FAKTY: "Alicja AFD-1234 jest prezydentem i szamanem, specjalista od języka Python"
-        FAKTY: "Sektor C4 to opuszczony sektor rolniczy"
-        {{
-         "przemyślenia": "Raport mówi o stanie krytycznym Alicji AFD-1234. Kim ona jest? Jakie informacje z faktów mogą pomóc mi zrozumieć sytuację Alicji? Czy Fakty wspominają coś o sektorze C4?",
-         "refleksja-nazwy": "Nazwy własne: Alicja AFD-1234, sektor C4. Jakie informacje z faktów mogą pomóc mi zrozumieć sytuację Alicji?",
-         "kluczowe-fakty": "Alicja AFD-1234 jest prezydentem i szaman, specjalista od języka Python. Sektor C4 to opuszczony sektor rolniczy",
-         "słowa-kluczowe": "Patrol, odnalezienie, Alicja AFD-1234, stan krytyczny, prezydent, kuternoga, Specjalista Python, sektor C4, opuszczony sektor rolniczy "
-        }}';
 
-        $messages = [
-            [
-                'role' => 'system',
-                'content' => $system
-            ],
-//            [
-//                'role' => 'user',
-//                'content' => json_encode(array_merge($content_documents, $content_facts))
-//            ]
-        ];
-        //json_encode($messages);
-        //dd(json_encode($messages));
+        $answerGPT = '{
+            "2024-11-12_report-00-sektor_C4.txt": "raport, sektor C, jednostka organiczna, Aleksander Ragowski, skan biometryczny, dział kontroli, radar, automatyzacja, technologia, roboty, broń, programowanie, Java, sztuczna inteligencja, ruch oporu, Barbara Zawadzka, front-end development, Krytyka, systemy monitorujące, każda strefa, eksperymenty, wybuchy, eksperymenty, technologia, ogniwa, laboratoria, przekroczenie, bezpieczeństwo, Rafał Bomba, techniki, Adam Gospodarczyk, D, magazyn, bezpieczeństwo, kontrola, komponenty, przemysł, nieautoryzowany dostęp.",
+            "2024-11-12_report-01-sektor_A1.txt": "alarm, ruch, organiczny, analiza, zwierzyna, obszar, patrol, spokój, sektor, zabezpieczenie, testowanie, broń, pomieszczenie, system, bezpieczeństwo, technologii, pracownik, tajne, montaż, robot, wojskowy, produkcja, kontrola, jakość, inżynier, sztuczna inteligencja, egzoszkielet, biometryczny, dostęp, projekt, ogniwa, bateria, badania, laboratoryjny, władza, opozycja, programowanie, Ragowski, Zawadzka, Azazel, doświadczenie, Adam, Gospodarczyk, przeszłość, technologia, ryzyko, eksperyment, skład, kontrola, monitoring, zakład, materiał, komponent, magazyn, systemy, operacyjny, roboty, maszyna, infrastruktura, zasoby, zabezpieczenia, zespół, naukowiec, laborant, asystent, badania, zaufanie, strategia, innowacja, sabotować, rząd, agent, ruch, przeciwnik, pieczenie, pizza, ananas, chaos, umiejętności, sabotować, techniki, prank, wybuch, mikroskopijny, eksperyment, maszyn.",
+            "2024-11-12_report-02-sektor_A3.txt": "raport, sektor A, sektor B, sektor C, sektor D, monitoring, technologia, broń, roboty, zespół, badania, eksperymenty, bezpieczeństwo, kontrola, sztuczna inteligencja, programowanie, Algorytm, bateria, automatyzacja, ruch oporu, Aleksander Ragowski, Barbara Zawadzka, Azazel, Rafał Bomba, Adam Gospodarczyk.",
+            "2024-11-12_report-03-sektor_A3.txt": "sektor A, sektor B, sektor C, sektor D, patrol, czujniki, życie organiczne, nowoczesna broń, systemy bezpieczeństwa, technicy, inżynierowie, roboty przemysłowe, testy broni, inteligencja sztuczna, egzoszkielety, monitoring, dane, eksperymenty, ogniwa bateryjne, laboratoria, bezpieczeństwo, prototypy, technologie, ruch oporu, programowanie, algorytmy, front-end development, maszyny, edukacja, krytyka, aresztowanie, Azazel, teleportacja, Zygfryd, Rafał Bomba, nanotechnologia, bezpieczeństwo, inżynieria, kodowanie, umiejętności, Adam Gospodarczyk, agent, kontrola, monitorowanie, magazyn, sprzęt, komponenty.",
+            "2024-11-12_report-04-sektor_B2.txt": "sektor B2, zachodnia część, teren, anomalie, odchylenia, normy, bezpieczeństwo, kanały komunikacyjne, punkt, Sektor C, obszar, broń, pomieszczenie, systemy bezpieczeństwa, materiały niebezpieczne, eksplozje, stanowiska testowe, ściany, osłony, automatyczne systemy monitorujące, test, dane, wstęp, technicy, inżynierowie, identyfikatory, odzież ochronna, prace, tajne, archiwizacja, raportowanie, Sektor A, montaż, roboty przemysłowe, jednostki wojskowe, działania bojowe, strefy, produkcyjne, komponenty, jakości, testy, konstrukcja, tajność, kontrola, sztuczna inteligencja, egzoszkielety, monitoring, ruch, anomalie, biometryczne, technologie, sztuczna inteligencja, baterie, wydajność, przemysł, zastosowania militarne, zespoły, inżynierowie, naukowcy, prototypy, gęstość, energia, pojemność, trwałość, warunki, aparaty diagnostyczne, struktury materiałów, bezpieczeństwo, eksperymenty, ryzyko, wybuchy, toksyczne gazy, komory, wyposażenie ochronne, wysokie temperatury, algorytmy, ładowania, regeneracji, mobilność, ograniczony dostęp, archiwizacja, przewaga technologiczna, Aleksander Ragowski, nauczyciel, języka angielskiego, Grudziądz, metody nauczania, zaangażowanie, edukacja, automatyzacja, rząd robotów, krytyka, aresztowanie, ucieczka, informatorzy, programowanie, stan psychiczny, opozycyjne, umiejętności, systemy rządowe, Barbara Zawadzka, frontend development, branża IT, automatyzacja, firma, kontrola sztucznej inteligencji, ruch oporu, JavaScript, Python, AI Devs, bazy wektorowe, algorytmy, walka wręcz, krav maga, techniki samoobrony, broń palna, koktajle Mołotowa, kontrasty, pizza, Gospodarczyk, programowanie, umiejętności, rekrutacyjne, techniki, sztuczna inteligencja, Azazel, podróżnik, teleportacja, technologie, systemy operacyjne, nadprzyrodzone, Zygfryd, mocodawca, badania, Rafał Bomba, laborant, badania, sztuczna inteligencja, nanotechnologia, asystent, eksperymenty, niewłaściwe, zaufanie, Adam Gospodarczyk, zakłady, kontrole, magazyn, produkcja, urządzenia, elastyczny, strefa laboratoryjna.",
+            "2024-11-12_report-05-sektor_C1.txt": "Sektor C, monitoring, bezpieczeństwo, testowanie, broń, materiały niebezpieczne, eksperymenty, roboty, przemysł, technologie, programowanie, sztuczna inteligencja, ruch oporu, inżynierowie, technicy, identyfikatory, archiwizacja, raportowanie, sektor A, sektor B, sektor D, badania, ogniwa bateryjne, naukowcy, laboratoria, prototypy, mobilność, Adam Gospodarczyk, Aleksander Ragowski, Barbara Zawadzka, Rafał Bomba, Azazel, Zygfryd, kontrola, jakość, zaginięcie, eksperymenty, umiejętności, tajne, zbrodnia, opozycja.",
+            "2024-11-12_report-06-sektor_C2.txt": "sektor C, skanery, temperatura, ruch, jednostka, patrol, obszar, broń, systemy bezpieczeństwa, materiały niebezpieczne, eksplozje, stanowiska testowe, technicy, inżynierowie, identyfikatory, odzież ochronna, prace tajne, archiwizacja, raportowanie, sektor A, montaż, roboty przemysłowe, jednostki wojskowe, strefy, linie produkcyjne, komponenty, rygorystyczna kontrola, testy, bezpieczeństwo, laboratoria, ogniwa bateryjne, zespół inżynierów, naukowców, prototypy, eksperymenty, komory zabezpieczone, obrażenia, baterie, mobilność, Adam Gospodarczyk, programowanie, ryzyko, systemy biometryczne, automatyzacja, Barbara Zawadzka, software, ruch oporu, Azazel, teleportacja, Zygfryd, Rafał Bomba, sztuczna inteligencja, nanotechnologia, tajne eksperymenty, inżynierowie, laboratoria, komponenty, surowce.",
+            "2024-11-12_report-07-sektor_C4.txt": "sygnał, nadajnik, czujnik, obiekt, analiza, odcisk, palec, osoba, imię, Barbara Zawadzka, baza, urodzeń, patrol, incydent, sektor, obszar, bezpieczeństwo, broń, pomieszczenie, system, monitorowanie, testy, produkcja, robot, montaż, technika, władza, ruch, opór, automatyzacja, spotkanie, zagrożenie, edukacja, algorytm, krytyka, aresztowanie, tożsamość, zniknięcie, nowoczesna, technologia, bateria, laboratorium, eksperyment, ryzyko, wybuch, gaz, biometria, mobilność, projekt, energii, Azazel, postać, przeszłość, teleportacja, systemy, operacyjny, Rafał Bomba, laborant, eksperyment, czas, nanotechnologia, zdrowie, psychiczne, zjawisko, pamięć, rzeczywistość, Gospodarczyk, programowanie, rekrutacja, agent, techniki, bypassowanie, ruch, kontrola, porzucenie, tajemnica, zakład, strategia, materiały, magazyn.",
+            "2024-11-12_report-08-sektor_A1.txt": "monitoring, obszar, patrol, ruch, aktywność, obserwacja, sektor, fabryka, broń, bezpieczeństwo, materiał, eksplozje, stanowisko, test, dane, technicy, inżynierowie, identyfikator, odzież, prace, tajność, archiwizacja, raportowanie, montaż, roboty, jednostki, bojowe, strefy, produkcja, komponenty, kontrola, jakość, wytrzymałość, sztuczna, inteligencja, egzoszkielety, monitoring, świat, technologia, ogniwa, energia, badania, laboratoria, eksperymenty, bezpieczeństwo, wybuch, gazy, prototypy, mobilność, szkolenie, umiejętności, programowanie, Java, JavaScript, Python, sztuczna, inteligencja, koktajl, Mołotow, Azazel, teleportacja, technologia, systemy, programowanie, agent, Gospodarczyk, rekrutacja, struktura, ruch, opór, Sektor A, Sektor B, Sektor C, Sektor D",
+            "2024-11-12_report-09-sektor_C2.txt": "sektor C, obszar, anomalia, systemy bezpieczeństwa, testowanie, nowoczesna broń, prowadzanie prób, technicy, inżynierowie, archiwizacja, raportowanie, sektor A, montaż, roboty przemysłowe, jednostki wojskowe, przestrzeń, strefy, linie produkcyjne, komponenty, kontrola jakości, robot wojskowy, sztuczna inteligencja, egzoszkielety, monitoring, biometryczne systemy, technologia, sektor B, ogniwa bateryjne, zespół, inżynier, naukowcy, materiały, laboratoria, aparaty diagnostyczne, zabezpieczenie, ryzyko, eksperymenty, testowanie, wysoka gęstość energetyczna, mobilność, Adam Gospodarczyk, Aleksander Ragowski, Barbara Zawadzka, Azazel, Rafał Bomba, Zygfryd, ruch oporu, programowanie, hacker, sztuczna inteligencja, nieautoryzowany dostęp."
+        }';
 
-        $answerGPT = $this->GPTservice->simplePrompt($messages, 'gpt-4o');
-        dd($answerGPT);
+        $response = $this->aiDev3PreWorkService->answerToAiDevs(
+            'dokumenty',
+            json_decode($answerGPT, true),
+            $this->aiDevs3Endpoint['REPORT_URL']
+        );
+        dd($response);
+
+
 
         //gpt-4o-mini
         $answerGPT = '{ 
