@@ -153,10 +153,10 @@ class GPTservice
 
 
 
-    function makeEmbeding($input): array
+    function makeEmbeding($input): array 
     {
         $payload = [
-            'model' => 'text-embedding-ada-002',
+            'model' => 'text-embedding-ada-002', // vectors size: 1536 
             'encoding_format' => 'float',
             'input' => json_encode($input)
         ];
@@ -167,7 +167,7 @@ class GPTservice
                 'POST',
                 'https://api.openai.com/v1/embeddings',
                 [
-                    'body' => $payload,
+                    'json' => $payload,
                     'headers' => [
                         'Content-Type' => 'application/json',
                         'Accept' => 'application/json',

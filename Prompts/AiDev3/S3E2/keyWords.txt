@@ -1,0 +1,2 @@
+Wygeneruj najważniejsze słowa kluczowe (w formie mianownika) z otrzymanego tekstu od użytkownika.
+Zwróć jedynie słowa kluczowe (max 10) w formie tablicy json.;
