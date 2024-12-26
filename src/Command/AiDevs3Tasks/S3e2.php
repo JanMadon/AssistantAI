@@ -25,11 +25,97 @@ class S3e2 extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $test = '["broń", "Mikroskalowy Wyzwalacz Plazmowy", "plazma", "temperatura", "zdolność", "nieskuteczność", "dystans", "system", "stabilizacja", "prototyp"]';
+        $question = 'W raporcie, z którego dnia znajduje się wzmianka o kradzieży prototypu broni?';
+        $emb_question = $this->GPTservice->makeEmbeding($question); 
+        
+        /*
+        POST collections/test_collection/points/search
+            {
+            "vector": [0.2, 0.1, 0.9, 0.7],
+            "limit": 3,
+            "with_payload": true
+            }
+        */
+        $colectionName = 'do-not-share';
 
-        //dd(json_decode($test));
+        $payload = [
+            "vector" => $emb_question,
+            "limit" => 1,
+            "with_payload" => true
+        ];
 
+        $serachResult = $this->httpClient->request(
+            'POST',
+            "http://localhost:6333/collections/$colectionName/points/search",
+            [
+                'headers' => ['Content-Type' => 'application/json', 'Accept' => 'application/json'],
+                'json' => $payload
+            ]
+        );
 
+        $serachResult = json_decode($serachResult->getContent(false));
+
+        dump($serachResult->result[0]->payload->date);
+        $answer = str_replace('_','-', $serachResult->result[0]->payload->date);
+        dump($answer);
+        $responseFromAiDevs = $this->aiDev3PreWorkService->answerToAiDevs(
+            'wektory',
+             $answer,
+              $this->aiDevs3Endpoint['REPORT_URL']
+            );
+            
+        dump($responseFromAiDevs);
+
+        return Command::SUCCESS;
+    }
+
+    private function createCollection(string $colectionName, int $vectorSize)
+    {
+        $payload = [
+            'vectors' => [
+                'size' => $vectorSize,
+                'distance' => 'Dot'
+            ]
+        ];
+
+        $response = $this->httpClient->request(
+            'PUT',
+            'http://localhost:6333/collections/' . $colectionName,
+            [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ],
+                'json' => $payload
+            ]
+        );
+        $jsonResponse = $response->getContent(false);
+
+        return json_decode($jsonResponse)->status;
+    }
+
+    //vactors = [['id' => {id}, 'vector' => [0.05, 0.76, 0.74], 'payload' => {structure}]...,
+    private function addVectors(array $paints, $colectionName) // todo added colection cto
+    {
+
+        $response = $this->httpClient->request(
+            'PUT',
+            "http://localhost:6333/collections/$colectionName/points",
+            [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ],
+                'json' => $paints
+            ]
+        );
+        $jsonResponse = $response->getContent(false);
+
+        return json_decode($jsonResponse)->status;
+    }
+
+    private function prepareData()
+    {
         dump($this->createCollection('do-not-share', 1536));
 
         $path_datas = glob('var/AIDevs/do-not-share' . '/*.txt',);
@@ -65,7 +151,7 @@ class S3e2 extends BaseCommand
             };
 
             // prepare record 
-            $vectorRecords[] = [
+            $vectorRecords['points'][] = [
                 'id' => $id,
                 'vector' => $embeding,
                 'payload' => ['date' => $fileName, 'keywords' => $keywords]
@@ -76,52 +162,5 @@ class S3e2 extends BaseCommand
 
         $seveResult = $this->addVectors($vectorRecords, 'do-not-share');
         dump($seveResult);
-
-        return Command::SUCCESS;
-    }
-
-    private function createCollection(string $colectionName, int $vectorSize)
-    {
-        $payload = [
-            'vectors' => [
-                'size' => $vectorSize,
-                'distance' => 'Dot'
-            ]
-        ];
-
-        $response = $this->httpClient->request(
-            'PUT',
-            'http://localhost:6333/collections/' . $colectionName,
-            [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
-                ],
-                'json' => $payload
-            ]
-        );
-        $jsonResponse = $response->getContent(false);
-
-        return json_decode($jsonResponse)->status;
-    }
-
-    //vactors = [['id' => {id}, 'vector' => [0.05, 0.76, 0.74], 'payload' => {structure}]...,
-    private function addVectors(array $vectors, $colectionName) // todo added colection cto
-    {
-
-        $response = $this->httpClient->request(
-            'PUT',
-            "http://localhost:6333/collections/$colectionName/points",
-            [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
-                ],
-                'json' => $vectors
-            ]
-        );
-        $jsonResponse = $response->getContent(false);
-
-        return json_decode($jsonResponse)->status;
     }
 }
