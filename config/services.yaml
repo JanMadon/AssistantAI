@@ -22,7 +22,7 @@ parameters:
         S1E5_PERSONAL_DATA: '%env(S1E5_PERSONAL_DATA)%'
         S2E3_IMAGE_DESCRIPTION: '%env(S2E3_IMAGE_DESCRIPTION)%'
         S2E5_HTML_DATA: '%env(S2E5_HTML_DATA)%'
-
+        S3E3_API_DATABASE: '%env(S3E3_API_DATABASE)%'
 
 services:
     # default configuration for services in *this* file

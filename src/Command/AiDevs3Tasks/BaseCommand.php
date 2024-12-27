@@ -15,6 +15,8 @@ abstract class BaseCommand extends Command
     protected AiDev3PreWorkService $aiDev3PreWorkService;
     protected array $aiDevs3Endpoint;
     protected HttpClientInterface $httpClient;
+    protected ParameterBagInterface $envParma;
+
     public function __construct(
         GPTservice $GPTservice,
         AiDev3PreWorkService $aiDev3PreWorkService,
@@ -30,5 +32,6 @@ abstract class BaseCommand extends Command
         $this->aiDevs3Endpoint = $parameterBag->get('AI3_ENDPOINTS');
         $this->httpClient = $httpClient;
         $this->cache = $cache;
+        $this->envParma = $parameterBag;
     }
 }

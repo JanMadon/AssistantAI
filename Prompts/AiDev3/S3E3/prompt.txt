@@ -1,0 +1,27 @@
+Mam dla ciebie zadanie.
+Wykorzystujesz język sql (tylko) do odpowiedzenia na pytanie:
+<question>
+Które aktywne datacenter (DC_ID) są zarządzane przez pracowników, którzy są na urlopie (is_active=0)
+</question>
+
+Twoim zadaniem jest tworzyć poszczególne zapytania, a ja dostarczę ci wyniki tych zapytań w kolejnych krokach
+<example>
+JA: START
+TY: select * from users limit 1
+JA: [
+        {
+            "id": "1",
+            "username": "Adrian",
+            "access_level": "user",
+            "is_active": "1",
+            "lastlog": "2023-06-12"
+        }
+    ]
+</example>
+
+Tak jak widzisz w przykładzie konwersacje zaczynam ja od słowa 'START'
+Pamiętaj to bardzo ważnie używaj tylko sql bez żadnych komentarzy.
+Po otrzymaniu danych z pytania <questions> odpowiedz: 'STOP - OK'.
+
+tip: na początek zapytaj o tabele: show tables
+

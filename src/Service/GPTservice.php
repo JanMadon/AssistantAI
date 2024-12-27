@@ -253,7 +253,7 @@ class GPTservice
     public function gptRequest(array $payload): string
     {
         try {
-            $response = $this->httpClient->request(
+            $request = $this->httpClient->request(
                 'POST',
                 $this->url,
                 [
@@ -266,7 +266,9 @@ class GPTservice
                     ]
                 ]
             );
-            $response = json_decode($response->getContent(false))->choices[0]->message->content;
+            $response = json_decode($request->getContent(false));
+            dump($response);
+            $response = $response->choices[0]->message->content;
         } catch (ClientException $exception) {
             $response = $exception->getMessage();
         } catch (HttpExceptionInterface $exception) {
