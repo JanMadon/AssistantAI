@@ -267,7 +267,6 @@ class GPTservice
                 ]
             );
             $response = json_decode($request->getContent(false));
-            dump($response);
             $response = $response->choices[0]->message->content;
         } catch (ClientException $exception) {
             $response = $exception->getMessage();

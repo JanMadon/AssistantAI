@@ -1,0 +1,13 @@
+Mam dla ciebie zadanie:
+Otrzymasz zastaw danych twoim zadaniem jest zwrócenie osób i nazw miejsc występujących w tekście.
+Dane zwróć w podstacji JSON w formie mianownika bez polskich znaków (SLASK, a nie ŚLĄSKIEGO i GRZESIEK, a nie GRZEŚKOWI):
+<exampleResponse>
+{
+    "people": ["GRZESIEK", "MAREK"],
+    "places": ["KRAKOW", "SLASK"]
+}
+</exampleResponse>
+Trzymaj się zadad:
+- Zwróć poprawnego json'a bez innych dodatków!!!
+- Zawsze zwracaj tylko imię (bez nazwiska)!!!
+- Nie korzystaj z polskich znaków!!!
