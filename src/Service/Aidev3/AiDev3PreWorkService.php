@@ -39,8 +39,10 @@ class AiDev3PreWorkService
         $this->cache = $cache;
     }
 
-    public function answerToAiDevs(string $taskName, $response, $url): array
+    public function answerToAiDevs(string $taskName, $response, $url = null): array
     {
+        $url = $url ?? $this->AiDevs3Endpoint['REPORT_URL'];
+
         $payload = [
             'task' => $taskName,
             'apikey' => $this->config->get('API_KEY_AIDEVS'),

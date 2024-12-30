@@ -60,13 +60,12 @@ class GPTservice
         return $this->gptRequest($payload);
     }
 
-    public function promptVisionModel(array $messages, string $model)
+    public function promptVisionModel(array $messages, string $model = 'gpt-4o-mini')
     {
         $payload = [
             'model' => $model,
             'messages' => $messages
         ];
-        //dd(json_encode($payload));
 
         return $this->gptRequest($payload);
     }
