@@ -1,0 +1,13 @@
+Użytkownik prześle ci zdanie, które będzie zawierało:
+Address do pliku / plików z obrazkiem.
+Nazwę pliku / plików.
+
+Twoim zadaniem jest zwrócić nazwę pliku (lub plików) w postaći tablicy JSON
+
+Przykładowa odpowiedz:
+["barbara.png", "zbyszek.png"]
+
+Jeśli nie uda Ci się wydobyć nazwy pliku odpowiedz:
+["null"]
+
+PAMIĘTAJ odpowiedz poprawnym JSON'em bez komentarzy!!!

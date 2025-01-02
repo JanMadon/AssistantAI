@@ -38,6 +38,25 @@ class GPTservice
         return $this->gptRequest($payload);
     }
 
+    public function oneShootPrompt(string $system, string $prompt, string $model = 'gpt-4o-mini'): string
+    {
+        $payload = [
+            'model' => $model,
+            'messages' => [
+                [
+                    'role' => 'system',
+                    'content' => $system
+                ],
+                [
+                    'role' => 'user',
+                    'content' => $prompt
+                ],
+            ]
+        ];
+
+        return $this->gptRequest($payload);
+    }
+
     public function prompt(string $system, array|string $contents, string $model = 'gpt-3.5-turbo', $config = '')
     {
         $contents = $this->prepareConversationArray($contents);
