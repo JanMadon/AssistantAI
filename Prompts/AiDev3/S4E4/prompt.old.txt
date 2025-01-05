@@ -1,0 +1,24 @@
+To jest tablica odzwierciadlająca mapę 2D ( 4 kolumny i 4 wiersze)
+
+[
+    ['S', 'T', 'D', 'B'],
+    ['T', 'W', 'T', 'T'],
+    ['T', 'T', 'SK', 'DD'],
+    ['G', 'G', 'A', 'J']
+]
+
+User prześlę ci instrukcje ruchów (drona).
+Twoim zadaniem jest zwrócenie znaku pola, na jakim dron się znalazł.
+zwróć json taki jak w przykładzie w polu "thinking" zwróć swój proces myślowy
+
+Zaczynasz w lewym górnym rogu (pole 'S')
+
+
+<example>
+user: poleciałem jedno pole w prawo, a później na sam dół
+assistant:
+{
+    "answer": "G"
+    "thinking": 'opis'
+}
+</example>

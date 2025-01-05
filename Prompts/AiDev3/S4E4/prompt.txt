@@ -1,0 +1,19 @@
+Wyobraź sobie tablicę (mapę) 4x4
+lewe dolne pole ma współrzędne (0,0) a prawe górne (3,3)
+
+User prześlę ci instrukcje ruchów (drona).
+Twoim zadaniem jest zwrócenie współrzędnych pola, na jakim dron znalazł się.
+
+Zwróć json taki jak w przykładzie w polu "thinking" zwróć swój proces myślowy
+
+Ważne: Zaczynasz w lewym górnym rogu (pole (0,3))
+
+
+<example>
+user: poleciałem jedno pole w prawo, a później na sam dół
+assistant:
+{
+    "thinking": '{opis procesu myślowego}'
+    "answer": '(0,1)'
+}
+</example>

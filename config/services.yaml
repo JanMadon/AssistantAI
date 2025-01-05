@@ -26,6 +26,9 @@ parameters:
         S3E4_DATA_BARBARA: '%env(S3E4_DATA_BARBARA)%'
         S3E4_PEOPLE: '%env(S3E4_PEOPLE)%'
         S3E4_PLACES: '%env(S3E4_PLACES)%'
+        S4E3_QUESTION: '%env(S4E3_QUESTION)%'
+        S4E3_CONTENT_PAGE: '%env(S4E3_CONTENT_PAGE)%'
+
 
 services:
     # default configuration for services in *this* file
