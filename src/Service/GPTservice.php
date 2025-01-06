@@ -103,7 +103,7 @@ class GPTservice
                         ],
                         [
                             "type" => "image_url",
-                            "image_url" => [ "url" => "data:image/jpeg;base64," . base64_encode($imagePath) ]
+                            "image_url" => [ "url" => "data:image/jpeg;base64," . base64_encode(file_get_contents($imagePath)) ]
                         ]
                     ]
                 ]
@@ -285,6 +285,9 @@ class GPTservice
                 ]
             );
             $response = json_decode($request->getContent(false));
+            if(!isset($response->choices[0]->message->content)){
+               dd($response);
+            }
             $response = $response->choices[0]->message->content;
         } catch (ClientException $exception) {
             $response = $exception->getMessage();

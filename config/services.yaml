@@ -28,6 +28,7 @@ parameters:
         S3E4_PLACES: '%env(S3E4_PLACES)%'
         S4E3_QUESTION: '%env(S4E3_QUESTION)%'
         S4E3_CONTENT_PAGE: '%env(S4E3_CONTENT_PAGE)%'
+        S4E5_QUESTION_JSON: '%env(S4E5_QUESTION_JSON)%'
 
 
 services:
