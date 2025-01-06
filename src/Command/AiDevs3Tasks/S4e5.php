@@ -69,7 +69,7 @@ class S4e5 extends BaseCommand
 
 //        $answers = [];
 //        foreach ($questions as $key => $question) {
-//            $messages[] = ['role' => 'user', 'content' => 'Jakie miejscowości zawartę są w notatniku'];
+//            $messages[] = ['role' => 'user', 'content' => 'Odpowiedz na pytanie użytkownika, na postawie kontekstu'];
 //            $answerGPT = $this->GPTservice->simplePrompt($messages, 'gpt-4o');
 //            dump($answerGPT);
 //

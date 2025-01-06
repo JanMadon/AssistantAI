@@ -1,0 +1,23 @@
+Mam zadanie o takim poleceniu:
+
+" Zdobyliśmy transkrypcję nagrań z kilku rozmów, które mogą być dla nas interesujące.
+Wszystkie pośrednio lub bezpośrednio dotyczą Rafała.
+Niestety dane, które posiadamy, są dosłownie poszatkowane.
+Wiemy, że wszystkich rozmów było 5 sztuk. Wiemy także z logów, jakim zdaniem rozpoczyna i kończy się każda rozmowa.
+Dodatkowo dowiedzieliśmy się, że podczas rozmowy padają pewne sprzeczne ze sobą informacje.
+Trzeba zweryfikować, który z rozmówców jest kłamcą i wykluczyć jego wersję podawanych nam danych. "
+
+Poniżej podaje json'a który zawiera 5 rozmów (rozmowa1, rozmowa2, rozmowa3, rozmowa4, rozmowa5) oraz reszta rozmów
+
+Zastanów się nad tą rozmową i uzupełnij rozmowy danymi z "reszta"
+W każdej rozmowie uczestniczą tylko dwie osoby, które wypowiadają się naprzemiennie.
+Imiona rozmówców są unikalne, więc jeśli np. Stefan pojawia się w pierwszej i piątej rozmowie, to jest to ten sam Stefan.
+
+Odpowiedz zwróć w formie jsona:
+{
+    "rozmowa1": {
+        "authors": "osoby biorące udział w rozmowie",
+        "conversations": "[authors1] - pełna rozmowa osób '\n' [authors2] - pełna razmowa osób",
+        "thinking": "dodatkowe spostrzeżenia/informacje (jeśli potrzebujesz zwrócić)"
+    }
+}
