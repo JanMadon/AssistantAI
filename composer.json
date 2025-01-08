@@ -6,7 +6,9 @@
     "require": {
         "php": ">=8.2",
         "ext-ctype": "*",
+        "ext-dom": "*",
         "ext-iconv": "*",
+        "ext-mysql_xdevapi": "*",
         "doctrine/dbal": "^3",
         "doctrine/doctrine-bundle": "^2.12",
         "doctrine/doctrine-migrations-bundle": "^3.3",
@@ -46,9 +48,7 @@
         "symfony/yaml": "7.1.*",
         "symfonycasts/verify-email-bundle": "^1.17",
         "twig/extra-bundle": "^2.12|^3.0",
-        "twig/twig": "^2.12|^3.0",
-        "ext-dom": "*",
-      "ext-mysql_xdevapi": "*"
+        "twig/twig": "^2.12|^3.0"
     },
     "config": {
         "allow-plugins": {
