@@ -35,6 +35,7 @@ parameters:
         S5E2_LOGS: '%env(S5E2_LOGS)%'
         S5E2_LOGS_QUESTION: '%env(S5E2_LOGS_QUESTION)%'
         S5E2_GPS: '%env(S5E2_GPS)%'
+        S5E3_RAFAL_URL: '%env(S5E3_RAFAL_URL)%'
 
 
 services:

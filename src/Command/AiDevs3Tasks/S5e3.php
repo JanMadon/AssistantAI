@@ -46,14 +46,15 @@ class S5e3 extends BaseCommand
 
         $startTime = microtime(true);
 
-//        $token = $this->makeRequest()->message;
-//        print_r('token:'. $token . PHP_EOL);
-//        dd($this->makeRequest($token));
+        $token = $this->makeRequest()->message;
+        print_r('token:'. $token . PHP_EOL);
+        $login = $this->makeRequest($token);
+        dump($login);
 
 
         // To make async requests you need to have the php-curl extension enabled
-        $promise1 = $this->httpClient->request('GET', 'https://rafal.ag3nts.org/source0');
-        $promise2 = $this->httpClient->request('GET', 'https://rafal.ag3nts.org/source1');
+        $promise1 = $this->httpClient->request('GET', $login->message->challenges[0]);
+        $promise2 = $this->httpClient->request('GET', $login->message->challenges[1]);
 
         $content = [];
         foreach ([$promise1, $promise2] as $promise) {
@@ -72,17 +73,32 @@ class S5e3 extends BaseCommand
             if(!isset($result->choices[0]->message->content)){
                 dd($result);
             }
-            $answers[] = json_decode($result->choices[0]->message->content);
+            $response = json_decode($result->choices[0]->message->content);
+            foreach ($response->answers as $answer) {
+                $answers[] = $answer;
+            }
         }
-        dump($answers);
 
-//        $data = [
-//            'apikey' => 'TWÓJ KLUCZ API',
-//            'timestamp' => 'znacznik-czas-pobrany-od-Rafała',
-//            'signature' => 'podpis cyfrowy znacznika czasu',
-//            'answer' => $,
-//        ];
+        dump( $answers);
 
+
+        $data = [
+            'apikey' => $this->envParma->get('API_KEY_AIDEVS'),
+            'timestamp' => $login->message->timestamp,
+            'signature' => $login->message->signature,
+            'answer' => $answers
+        ];
+
+        $response = $this->httpClient->request(
+            'POST',
+            $this->aiDevs3Endpoint['S5E3_RAFAL_URL'],
+            [
+                'headers' => ['content-type' => 'application/json'],
+                'json' => $data
+            ]
+        );
+
+        dump($response->getContent(false));
 
 
         $output->writeln('Execution time: ' . microtime(true) - $startTime . ' seconds');
@@ -92,7 +108,10 @@ class S5e3 extends BaseCommand
     private function prepareRequest($task): ResponseInterface
     {
         if(count($task->data) == 4) {
-            $content = 'Odpowiedz na pytania. Najkrócej jak to możliwe!!! format odpowiedzi w json: '
+            $content = 'Odpowiedz na pytania. Najkrócej jak to możliwe!!!
+             tipy najstarszy hymn polski to: Bogurodzica
+             ###
+             format odpowiedzi w json: '
                 . json_encode(['answer_1', 'answer_2', 'answer_3', 'answer_4'])
                 . ' ### questions: [' . implode(', ', $task->data) . ']'
             ;
@@ -142,7 +161,7 @@ class S5e3 extends BaseCommand
 
         $response = $this->httpClient->request(
             'POST',
-            'https://rafal.ag3nts.org/b46c3',
+            $this->aiDevs3Endpoint['S5E3_RAFAL_URL'],
             [
                 'headers' => ['content-type' => 'application/json'],
                 'json' => $payload
