@@ -28,6 +28,40 @@ class GPTservice
         $this->httpClient = $httpClient;
     }
 
+    public function functionCalling(string $userPrompt, string $system, array $functions,string $model = 'gpt-4o-mini', string $function_call='auto'): Object|string
+    {
+        $payload = [
+            'model' => $model,
+            'messages' => [
+                ['role' => 'system', 'content' => $system],
+                ['role' => 'user', 'content' => $userPrompt]
+            ],
+            'functions' => $functions,
+            'function_call' => $function_call
+        ];
+
+        $request = $this->httpClient->request(
+            'POST',
+            $this->url,
+            [
+                'json' => $payload,
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                    'Content-Length: ' . strlen(json_encode($payload)),
+                    'Authorization' => 'Bearer ' . $this->config->get('API_KEY_OPENAI')
+                ]
+            ]
+        );
+        $response = json_decode($request->getContent(false));
+        if(isset($response->choices[0]->message->function_call)){
+            return $response->choices[0]->message->function_call;
+        } else{
+            return $response->choices[0]->message->content;
+        }
+
+    }
+
     public function simplePrompt(array $messages, string $model = 'gpt-4o-mini')
     {
         $payload = [

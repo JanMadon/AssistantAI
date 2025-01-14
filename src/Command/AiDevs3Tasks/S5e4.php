@@ -30,7 +30,7 @@ class S5e4 extends BaseCommand
         // start task send address my application
         $response = $this->aiDev3PreWorkService->answerToAiDevs(
             'serce',
-            'https://d5c9-2a02-a31b-21c3-9080-78ee-e273-94ca-d0c6.ngrok-free.app/s4e4' // i use ngrok (like s4e4)
+            'https://2ffd-2a02-a31b-21c3-9080-488d-a06d-bff8-7235.ngrok-free.app/s5e4-jb' // I use ngrok (like s4e4)
         );
 
         dump($response);
