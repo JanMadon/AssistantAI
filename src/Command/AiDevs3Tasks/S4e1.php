@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use function PHPUnit\Framework\isNull;
 
-#[AsCommand(name: 'app:S4e1', description: 'Add a short description for your command')]
+#[AsCommand(name: 'app:S4e1', description: 'Week 4 / task monday')]
 class S4e1 extends BaseCommand
 {
 

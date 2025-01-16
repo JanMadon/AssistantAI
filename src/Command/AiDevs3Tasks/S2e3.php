@@ -8,20 +8,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: 'app:ai-devs-s2e3',description: 'Add a short description for your command',)]
-class S2e3Command extends BaseCommand
+#[AsCommand(name: 'app:S2e3',description: 'Week 2 / task wednesday')]
+class S2E3 extends BaseCommand
 {
-   // public function __construct()
-   // {
-       // parent::__construct();
-   // }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        //$io = new SymfonyStyle($input, $output);
-        //$io->success('You have a new command! Now make it your own! Pass --help to see your options.');
-
-
         $request = $this->httpClient->request('GET', $this->aiDevs3Endpoint['S2E3_IMAGE_DESCRIPTION']);
         $description = json_decode($request->getContent())->description;
 

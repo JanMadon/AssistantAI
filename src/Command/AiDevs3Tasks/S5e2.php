@@ -14,7 +14,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use function PHPUnit\Framework\isNull;
 use function Symfony\Component\Translation\t;
 
-#[AsCommand(name: 'app:S5e2', description: 'Add a short description for your command')]
+#[AsCommand(name: 'app:S5e2', description: 'Week 4 / task tuesday')]
 class S5e2 extends BaseCommand
 {
 

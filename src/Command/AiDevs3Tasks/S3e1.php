@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Contracts\Cache\CacheInterface;
 
-#[AsCommand(name: 'app:S3e1',description: 'Add a short description for your command')]
+#[AsCommand(name: 'app:S3e1',description: 'Week 3 / task monday')]
 class S3e1 extends BaseCommand
 {
 

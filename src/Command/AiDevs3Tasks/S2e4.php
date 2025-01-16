@@ -11,8 +11,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: 'app:S2e4Command',description: 'Add a short description for your command')]
-class S2e4Command extends BaseCommand
+#[AsCommand(name: 'app:S2e4',description: 'Week 2 / task thursday')]
+class S2E4 extends BaseCommand
 {
 
     protected function configure(): void

@@ -15,7 +15,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 use function PHPUnit\Framework\isNull;
 use function Symfony\Component\Translation\t;
 
-#[AsCommand(name: 'app:S5e3', description: 'Add a short description for your command')]
+#[AsCommand(name: 'app:S5e3', description: 'Week 5 / task wednesday')]
 class S5e3 extends BaseCommand
 {
 

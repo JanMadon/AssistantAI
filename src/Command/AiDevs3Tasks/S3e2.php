@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use function PHPUnit\Framework\isNull;
 
-#[AsCommand(name: 'app:S3e2', description: 'Add a short description for your command')]
+#[AsCommand(name: 'app:S3e2', description: 'Week 3 / task tuesday')]
 class S3e2 extends BaseCommand
 {
 
