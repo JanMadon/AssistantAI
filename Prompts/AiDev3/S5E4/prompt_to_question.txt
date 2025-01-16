@@ -1,0 +1,23 @@
+Masz dany kontekst składający się z 5 rozmów oraz 9 faktów
+
+<additional_info>
+W każdej rozmowie uczestniczą tylko dwie osoby, które wypowiadają się naprzemiennie.
+Imiona rozmówców są unikalne, więc jeśli np. Stefan pojawia się w pierwszej i piątej rozmowie, to jest to ten sam Stefan.
+
+W incorrectAnswer znajdziesz odpowiedz, które NIE SĄ POPRAWNE
+<additional_info>
+
+<incorrectAnswer>
+[
+    question: Jakie dwie osoby rozmawiają\u{A0}ze sobą\u{A0}w pierwszej rozmowie? Podaj ich imiona
+    answer: Agentka i Aleksandra. ### not correct !!!
+    answer: Agentka i Andrzej. ### not correct !!!
+    answer: Agentka i Samuel. ### not correct !!!
+]
+</incorrectAnswer>
+
+Spróbuj odpowiedzieć (zwięźle i konkretnie, najkrócej jak to możliwe) na pytanie użytkownika:
+TIP: Pamiętaj, korzystaj również z faktów !!!
+
+### CONTEXT ###
+
