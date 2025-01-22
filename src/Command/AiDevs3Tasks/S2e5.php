@@ -14,7 +14,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Contracts\Cache\CacheInterface;
 
 #[AsCommand(name: 'app:S2e5',description: 'Week 2 / task friday')]
-class S2E5 extends BaseCommand
+class S2e5 extends BaseCommand
 {
     /**
      * @param array $mp3_records_full_urls

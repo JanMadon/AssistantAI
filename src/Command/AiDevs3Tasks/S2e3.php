@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(name: 'app:S2e3',description: 'Week 2 / task wednesday')]
-class S2E3 extends BaseCommand
+class S2e3 extends BaseCommand
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
     {

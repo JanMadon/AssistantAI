@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(name: 'app:S2e4',description: 'Week 2 / task thursday')]
-class S2E4 extends BaseCommand
+class S2e4 extends BaseCommand
 {
 
     protected function configure(): void
