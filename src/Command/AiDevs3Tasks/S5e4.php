@@ -16,15 +16,6 @@ use function PHPUnit\Framework\isNull;
 #[AsCommand(name: 'app:S5e4', description: 'Week 4 / task thursday')]
 class S5e4 extends BaseCommand
 {
-
-    protected function configure(): void
-    {
-        $this
-            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-        ;
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // start task send address my application

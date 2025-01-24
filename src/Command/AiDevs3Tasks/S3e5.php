@@ -15,15 +15,6 @@ use function PHPUnit\Framework\isNull;
 #[AsCommand(name: 'app:S3e5', description: 'Week 3 / task friday')]
 class S3e5 extends BaseCommand
 {
-
-    protected function configure(): void
-    {
-        $this
-            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-        ;
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
 //        $users = $this->getApiDatabase('select * from users');

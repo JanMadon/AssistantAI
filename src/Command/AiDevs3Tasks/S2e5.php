@@ -16,19 +16,6 @@ use Symfony\Contracts\Cache\CacheInterface;
 #[AsCommand(name: 'app:S2e5',description: 'Week 2 / task friday')]
 class S2e5 extends BaseCommand
 {
-    /**
-     * @param array $mp3_records_full_urls
-     * @param $mp3_records_urls
-     * @return mixed
-     */
-    protected function configure(): void
-    {
-        $this
-            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-        ;
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         //$this->test();

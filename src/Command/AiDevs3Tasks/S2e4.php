@@ -14,15 +14,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'app:S2e4',description: 'Week 2 / task thursday')]
 class S2e4 extends BaseCommand
 {
-
-    protected function configure(): void
-    {
-        $this
-            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-        ;
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $path = 'var/AiDev3_data/pliki_z_fabryki';

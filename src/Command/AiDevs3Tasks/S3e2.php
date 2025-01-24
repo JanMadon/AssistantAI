@@ -14,15 +14,6 @@ use function PHPUnit\Framework\isNull;
 #[AsCommand(name: 'app:S3e2', description: 'Week 3 / task tuesday')]
 class S3e2 extends BaseCommand
 {
-
-    protected function configure(): void
-    {
-        $this
-            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-        ;
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $question = 'W raporcie, z którego dnia znajduje się wzmianka o kradzieży prototypu broni?';
