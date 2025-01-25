@@ -18,7 +18,7 @@ class S1e1 extends BaseCommand
         $dom->loadHTML($htmlDomContent);
         $question = substr($dom->getElementById('human-question')->textContent, 9);
 
-        $answerGPT = $this->GPTservice->prompt('Podaj rok jako cyfrę nic więcej nie zwracaj', $question, 'gpt-4o-mini');
+        $answerGPT = $this->GPTservice->oneShootPrompt('Podaj rok jako cyfrę nic więcej nie zwracaj', $question, 'gpt-4o-mini');
 
         $responseAiDevs = $this->httpClient->request(
             'POST',

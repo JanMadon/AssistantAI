@@ -27,7 +27,7 @@ class S3e2 extends BaseCommand
             "with_payload": true
             }
         */
-        $colectionName = 'do-not-share';
+        $collectionName = 'do-not-share';
 
         $payload = [
             "vector" => $emb_question,

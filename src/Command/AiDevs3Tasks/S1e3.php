@@ -21,7 +21,7 @@ class S1e3 extends BaseCommand
         foreach ($rawData->{'test-data'} as &$data) {
             $data->answer = eval("return $data->question ;");
             if (isset($data->test)) {
-                $gptAnswer = $this->GPTservice->prompt(
+                $gptAnswer = $this->GPTservice->oneShootPrompt(
                     'Odpowiedz krótko na pytanie',
                     $data->test->q
                 );

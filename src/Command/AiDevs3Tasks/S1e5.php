@@ -29,7 +29,7 @@ class S1e5 extends BaseCommand
 
         $systemPrompt = 'Zamień wszelkie wrażliwe dane (imię + nazwisko, nazwę ulicy + numer, miasto, wiek osoby na słowo CENZURA';
 
-        $gptResponse = $this->GPTservice->prompt($systemPrompt, $sensitiveData, 'gpt-4');
+        $gptResponse = $this->GPTservice->oneShootPrompt($systemPrompt, $sensitiveData, 'gpt-4');
         $output->writeln('Chat response: '. dump($gptResponse));
         $output->writeln('------------------------------------');
 

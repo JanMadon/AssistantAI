@@ -17,7 +17,7 @@ class S1e2 extends BaseCommand
         $msgID = $startResponse->msgID ?? 0;
 
         $prompt = file_get_contents('Prompts/AiDev3/S1E2/prompt.txt');
-        $answerChat = $this->GPTservice->prompt($prompt, $startResponse->text);
+        $answerChat = $this->GPTservice->oneShootPrompt($prompt, $startResponse->text);
 
         $finishResponse = $this->requestToAuthTask($answerChat, $msgID);
 
