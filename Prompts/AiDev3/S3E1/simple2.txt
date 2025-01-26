@@ -1,5 +1,0 @@
-Wygeneruj słowa kluczowe w formie mianownika (czyli np. “sportowiec”, a nie “sportowcem”, “sportowców” itp.).
-Przy generowaniu posiłkuj się również danymi z facts (jeśli nade z facts odnoszą się do dokumentu, traktuj to jako całość
-- tj uwzględnij również słowa kluczowe z facts). Zwróć również uwagę na nazwę dokument.
-
-Zwróć jedynie słowa kluczowe oddzielone przecinkiem bez zbędnych komentarzy.
