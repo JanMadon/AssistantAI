@@ -49,6 +49,8 @@ class AiDev3PreWorkService
             'answer' => $response,
         ];
 
+        dump(json_encode($payload));
+
         $result = $this->httpClient->request(
             'POST',
             $url,

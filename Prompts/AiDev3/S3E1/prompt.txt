@@ -1,0 +1,9 @@
+Wygeneruj słowa kluczowe w formie mianownika (czyli np. “sportowiec”, a nie “sportowcem”, “sportowców” itp.).
+Przy generowaniu posiłkuj się również danymi z "facts".
+UWAGA nie wszystkie fakty pasują do dokumentu (wywnioskuj, które pasują i tylko je bierz pod uwagę)
+
+Zwróć odpowiedź jako obiekt json:
+{"nazwa-dokumentu.txt": "słowa kluczowe oddzielone przecinkiem"}
+
+TIP:
+uwzględnij nazwę sektora, który znajduję sie w nazwię dokumentu

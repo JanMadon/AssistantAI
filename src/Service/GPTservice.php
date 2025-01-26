@@ -72,7 +72,7 @@ class GPTservice
         return $this->gptRequest($payload);
     }
 
-    public function oneShootPrompt(string $system, string $prompt, string $model = 'gpt-4o-mini'): string
+    public function oneShootPrompt(string $system, string $prompt, string $model = 'gpt-4o-mini', bool $jsonMode = false): string
     {
         $payload = [
             'model' => $model,
@@ -87,6 +87,9 @@ class GPTservice
                 ],
             ]
         ];
+        if($jsonMode){
+            $payload['response_format'] = ['type' => 'json_object'];
+        }
 
         return $this->gptRequest($payload);
     }
