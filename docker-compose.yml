@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  web:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./public/:/var/www/html # czy tu na pewno ma być ./public ????
+      - ./docker/www_logs/nginx:/var/log/nginx
+    depends_on:
+      - php
+      - db
+
+  php:
+    build: ./docker
+    container_name: php
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  db:
+    image: mysql:8
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
