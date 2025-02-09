@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use App\Service\LMM\ChatLmmService;
+use App\ValueObjects\ChatModels;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -12,7 +14,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 
-class GPTservice
+class GPTservice implements ChatLmmService
 {
 
     private string $url = 'https://api.openai.com/v1/chat/completions';
@@ -246,7 +248,7 @@ class GPTservice
         return (array) $response;
     }
 
-    public function getChatModels()
+    public function getChatModels(): array
     {
         try {
             $response = $this->httpClient->request(
@@ -268,7 +270,11 @@ class GPTservice
         } catch (TransportExceptionInterface $e) {
         }
 
-        return $response->data ?? null;
+        if(isset($response->data)){
+            return array_map(fn($model) => new ChatModels($model->id, $model->id), $response->data);
+        }
+
+        return [];
     }
 
     private function prepareConversationArray(array|string $conversation): array

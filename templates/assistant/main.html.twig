@@ -33,7 +33,7 @@
                     <label for="modelSelektor"> Model </label>
                     <select id="modelSelektor" class="form-select form-select-sm" aria-label="Default select example">
                         {% for model in models %}
-                            <option value="{{ model }}" {{ model == 'gpt-3.5-turbo' ? 'selected' : '' }} >{{ model }}</option>
+                            <option value="{{ model.id }}" {{ model == 'gpt-3.5-turbo' ? 'selected' : '' }} >{{ model.id }}</option>
                         {% endfor %}
                     </select>
                 </div>

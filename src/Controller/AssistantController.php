@@ -20,30 +20,16 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class AssistantController extends AbstractController
 {
-
-    private GPTservice $gptService;
-    private EntityManagerInterface $entityManager;
-    private ConversationRepository $conversationRepository;
-    private TemplateRepository $templateRepository;
-
     public function __construct(
-        GPTservice $gptService,
-        ConversationRepository $conversationRepository,
-        TemplateRepository $templateRepository,
-        EntityManagerInterface $entityManager)
-    {
-        $this->gptService = $gptService;
-        $this->conversationRepository = $conversationRepository;
-        $this->templateRepository = $templateRepository;
-        $this->entityManager = $entityManager;
-    }
+        private readonly GPTservice $gptService,
+        private readonly ConversationRepository $conversationRepository,
+        private readonly TemplateRepository $templateRepository,
+        private readonly EntityManagerInterface $entityManager
+    ){}
 
     #[Route('/assistant', 'assistant', methods: ['GET'])]
     public function assistant(Request $request, SerializerInterface $serializer): Response
     {
-        $models = array_map(function ($model){
-            return $model->id;
-        }, $this->gptService->getChatModels());
 
         $conversations = $this->conversationRepository->findBy([], ['id' => 'DESC']);
         $conversationsJson = $serializer->serialize($conversations, 'json', ['groups' => 'conversation']);
@@ -52,7 +38,7 @@ class AssistantController extends AbstractController
             'conversations' => $conversations,
             'conversationsJson' => $conversationsJson,
             'templates' => $templates,
-            'models' => $models,
+            'models' => $this->gptService->getChatModels(),
         ]);
     }
 

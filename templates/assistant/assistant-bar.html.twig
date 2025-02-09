@@ -75,7 +75,7 @@
             e.preventDefault()
             const templateData = new FormData(templateForm)
 
-            axios.post('https://localhost:8000/api/assistant/template', templateData)
+            axios.post("{{ path('template_save') }}", templateData)
                 .then(function (response) {
                     console.log('Formularz wysłany pomyślnie:', response.data);
                 })

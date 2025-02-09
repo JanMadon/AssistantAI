@@ -42,3 +42,5 @@ yarn-error.log
 /.idea/sshConfigs.xml
 /.idea/vcs.xml
 /.idea/webServers.xml
+
+/docker/www_logs/*
