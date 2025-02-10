@@ -3,6 +3,7 @@ namespace App\Controller;
 
 use App\Entity\Conversation;
 use App\Entity\Message;
+use App\Entity\SettingsLmm;
 use App\Entity\Template;
 use App\Repository\ConversationRepository;
 use App\Repository\TemplateRepository;
@@ -78,6 +79,22 @@ class AssistantController extends AbstractController
         $this->entityManager->flush();
 
        return new JsonResponse('ok');
+    }
+
+    #[Route('/api/assistant/save/chat-settings', 'assistent_save_settings', methods:['POST'])]
+    public function saveChatSettings(Request $request): Response
+    {
+        $request = json_decode($request->getContent());
+
+        $settings = new SettingsLmm();
+        $settings->setName($request->name);
+        $settings->setModelId($request->model);
+        $settings->setTemperature($request->temperature);
+        $settings->setMaxToken($request->maxToken);
+        $this->entityManager->persist($settings);
+        $this->entityManager->flush();
+
+        return new JsonResponse('ok');
     }
 
     #[Route('/api/assistant/test', 'assistent_testt')]
