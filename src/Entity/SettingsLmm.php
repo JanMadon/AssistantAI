@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Repository\SettingsLmmRepository;
+use App\Repository\LMM\SettingsLmmRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SettingsLmmRepository::class)]

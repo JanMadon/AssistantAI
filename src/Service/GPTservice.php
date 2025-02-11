@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use App\Service\LMM\ChatLmmService;
-use App\ValueObjects\ChatModels;
+use App\ValueObjects\LLM\ChatModel;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -271,7 +271,7 @@ class GPTservice implements ChatLmmService
         }
 
         if(isset($response->data)){
-            return array_map(fn($model) => new ChatModels($model->id, $model->id), $response->data);
+            return array_map(fn($model) => new ChatModel($model->id, $model->id), $response->data);
         }
 
         return [];

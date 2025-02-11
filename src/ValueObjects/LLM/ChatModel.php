@@ -1,8 +1,8 @@
 <?php
 
-namespace App\ValueObjects;
+namespace App\ValueObjects\LLM;
 
-class ChatModels
+class ChatModel
 {
     private string $id;
     private string $name;

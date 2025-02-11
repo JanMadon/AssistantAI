@@ -1,11 +1,10 @@
 <?php
 namespace App\Controller;
 
-use App\Entity\Conversation;
-use App\Entity\Message;
-use App\Entity\SettingsLmm;
+use App\DTO\SettingsLmmDTO;
 use App\Entity\Template;
 use App\Repository\ConversationRepository;
+use App\Repository\LMM\SettingsLmmRepository;
 use App\Repository\TemplateRepository;
 use App\Service\Chat\ConversationService;
 use App\Service\Chat\MessageService;
@@ -17,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 
 class AssistantController extends AbstractController
@@ -82,19 +82,42 @@ class AssistantController extends AbstractController
     }
 
     #[Route('/api/assistant/save/chat-settings', 'assistent_save_settings', methods:['POST'])]
-    public function saveChatSettings(Request $request): Response
+    public function saveChatSettings(Request $request, SettingsLmmRepository $settingsLmmRepository,  ValidatorInterface $validator): Response
     {
-        $request = json_decode($request->getContent());
+        $requestData = json_decode($request->getContent());
 
-        $settings = new SettingsLmm();
-        $settings->setName($request->name);
-        $settings->setModelId($request->model);
-        $settings->setTemperature($request->temperature);
-        $settings->setMaxToken($request->maxToken);
-        $this->entityManager->persist($settings);
-        $this->entityManager->flush();
+        if ($requestData === null) {
+            return new JsonResponse(['error' => 'Invalid JSON.'], Response::HTTP_BAD_REQUEST);
+        }
 
-        return new JsonResponse('ok');
+        $settings = new SettingsLmmDTO(
+            $requestData->name ?? null,
+            $requestData->model ?? null,
+            $requestData->temperature ?? null,
+            $requestData->maxToken ?? null,
+
+        );
+
+        $errors = $validator->validate($settings);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = [
+                    'field' => $error->getPropertyPath(),
+                    'message' => $error->getMessage(),
+                ];
+            }
+
+            return new JsonResponse([
+                'status' => 'error',
+                'errors' => $errorMessages,
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        //$settingsLmmRepository->saveSettings($settings);
+
+        return new JsonResponse(['status' => 'ok']);
     }
 
     #[Route('/api/assistant/test', 'assistent_testt')]
