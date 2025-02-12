@@ -2,8 +2,10 @@
 
 namespace App\Repository;
 
+use App\DTO\LMM\TemplateLmmDto;
 use App\Entity\Template;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -11,9 +13,19 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class TemplateRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry,  private readonly EntityManagerInterface $entityManager)
     {
         parent::__construct($registry, Template::class);
+
+    }
+
+    public function saveTemplate(TemplateLmmDto $templateDto): void
+    {
+        $template = new Template();
+        $template->setName($templateDto->name);
+        $template->setContent($templateDto->content);
+        $this->entityManager->persist($template);
+        $this->entityManager->flush();
     }
 
     //    /**
@@ -40,4 +52,5 @@ class TemplateRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
 }

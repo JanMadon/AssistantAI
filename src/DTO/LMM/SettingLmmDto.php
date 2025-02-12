@@ -1,10 +1,10 @@
 <?php
 
-namespace App\DTO;
+namespace App\DTO\LMM;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class SettingsLmmDTO
+class SettingLmmDto
 {
     #[Assert\NotNull]
     #[Assert\NotBlank]

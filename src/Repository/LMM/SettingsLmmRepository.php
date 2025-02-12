@@ -2,7 +2,7 @@
 
 namespace App\Repository\LMM;
 
-use App\DTO\SettingsLmmDTO;
+use App\DTO\LMM\SettingLmmDto;
 use App\Entity\SettingsLmm;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,7 +19,7 @@ class SettingsLmmRepository extends ServiceEntityRepository
         parent::__construct($registry, SettingsLmm::class);
     }
 
-    public function saveSettings(SettingsLmmDTO $settingsLmmDto): void
+    public function saveSettings(SettingLmmDto $settingsLmmDto): void
     {
         $settings = new SettingsLmm();
         $settings->setName($settingsLmmDto->name);

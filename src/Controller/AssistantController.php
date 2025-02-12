@@ -1,8 +1,8 @@
 <?php
 namespace App\Controller;
 
-use App\DTO\SettingsLmmDTO;
-use App\Entity\Template;
+use App\DTO\LMM\SettingLmmDto;
+use App\DTO\LMM\TemplateLmmDto;
 use App\Repository\ConversationRepository;
 use App\Repository\LMM\SettingsLmmRepository;
 use App\Repository\TemplateRepository;
@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 
 class AssistantController extends AbstractController
@@ -26,7 +25,7 @@ class AssistantController extends AbstractController
         private readonly GPTservice $gptService,
         private readonly ConversationRepository $conversationRepository,
         private readonly TemplateRepository $templateRepository,
-        private readonly EntityManagerInterface $entityManager
+        private readonly ValidatorService $validatorService
     ){}
 
     #[Route('/assistant', 'assistant', methods: ['GET'])]
@@ -73,17 +72,20 @@ class AssistantController extends AbstractController
     #[Route('/api/assistant/template', 'template_save', methods:['POST'])]
     public function saveTemplate(Request $request): Response
     {
-        $template = new Template();
-        $template->setName($request->get('name'));
-        $template->setContent($request->get('content'));
-        $this->entityManager->persist($template);
-        $this->entityManager->flush();
+        $templateDto = new TemplateLmmDto(
+            $request->get('name'),
+            $request->get('content')
+        );
 
-       return new JsonResponse('ok');
+        $this->validatorService->validateAndThrow($templateDto);
+
+        $this->templateRepository->saveTemplate($templateDto);
+
+       return new JsonResponse(['status' => 'ok']);
     }
 
     #[Route('/api/assistant/save/chat-settings', 'assistent_save_settings', methods:['POST'])]
-    public function saveChatSettings(Request $request, SettingsLmmRepository $settingsLmmRepository,  ValidatorService $validatorService): Response
+    public function saveChatSettings(Request $request, SettingsLmmRepository $settingsLmmRepository): Response
     {
         $requestData = json_decode($request->getContent());
 
@@ -91,13 +93,13 @@ class AssistantController extends AbstractController
             return new JsonResponse(['error' => 'Invalid JSON.'], Response::HTTP_BAD_REQUEST);
         }
 
-        $settings = new SettingsLmmDTO(
+        $settings = new SettingLmmDto(
             $requestData->name ?? null,
             $requestData->model ?? null,
             $requestData->temperature ?? null,
             $requestData->maxToken ?? null,
         );
-        $validatorService->validateAndThrow($settings);
+        $this->validatorService->validateAndThrow($settings);
 
         $settingsLmmRepository->saveSettings($settings);
 
