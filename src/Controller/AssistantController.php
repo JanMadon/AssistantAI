@@ -9,6 +9,7 @@ use App\Repository\TemplateRepository;
 use App\Service\Chat\ConversationService;
 use App\Service\Chat\MessageService;
 use App\Service\GPTservice;
+use App\Service\Validators\ValidatorService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -82,7 +83,7 @@ class AssistantController extends AbstractController
     }
 
     #[Route('/api/assistant/save/chat-settings', 'assistent_save_settings', methods:['POST'])]
-    public function saveChatSettings(Request $request, SettingsLmmRepository $settingsLmmRepository,  ValidatorInterface $validator): Response
+    public function saveChatSettings(Request $request, SettingsLmmRepository $settingsLmmRepository,  ValidatorService $validatorService): Response
     {
         $requestData = json_decode($request->getContent());
 
@@ -95,27 +96,10 @@ class AssistantController extends AbstractController
             $requestData->model ?? null,
             $requestData->temperature ?? null,
             $requestData->maxToken ?? null,
-
         );
+        $validatorService->validateAndThrow($settings);
 
-        $errors = $validator->validate($settings);
-
-        if (count($errors) > 0) {
-            $errorMessages = [];
-            foreach ($errors as $error) {
-                $errorMessages[] = [
-                    'field' => $error->getPropertyPath(),
-                    'message' => $error->getMessage(),
-                ];
-            }
-
-            return new JsonResponse([
-                'status' => 'error',
-                'errors' => $errorMessages,
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
-        //$settingsLmmRepository->saveSettings($settings);
+        $settingsLmmRepository->saveSettings($settings);
 
         return new JsonResponse(['status' => 'ok']);
     }

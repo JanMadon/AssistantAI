@@ -2,8 +2,8 @@
 
 namespace App\Repository\LMM;
 
+use App\DTO\SettingsLmmDTO;
 use App\Entity\SettingsLmm;
-use App\ValueObjects\LLM\SettingsLmmVO;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -19,13 +19,13 @@ class SettingsLmmRepository extends ServiceEntityRepository
         parent::__construct($registry, SettingsLmm::class);
     }
 
-    public function saveSettings(SettingsLmmVO $settingsLmmVO): void
+    public function saveSettings(SettingsLmmDTO $settingsLmmDto): void
     {
         $settings = new SettingsLmm();
-        $settings->setName($settingsLmmVO->getName());
-        $settings->setModelId($settingsLmmVO->getModel());
-        $settings->setTemperature($settingsLmmVO->getTemperature());
-        $settings->setMaxToken($settingsLmmVO->getMaxToken());
+        $settings->setName($settingsLmmDto->name);
+        $settings->setModelId($settingsLmmDto->model);
+        $settings->setTemperature($settingsLmmDto->temperature);
+        $settings->setMaxToken($settingsLmmDto->maxToken);
         $this->entityManager->persist($settings);
         $this->entityManager->flush();
     }
