@@ -25,6 +25,9 @@ class SettingsLmm
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $model_id = null;
 
+    #[ORM\Column]
+    private bool $default = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -77,4 +80,16 @@ class SettingsLmm
 
         return $this;
     }
+
+    public function isDefault(): bool
+    {
+        return $this->default;
+    }
+
+    public function setDefault(bool $default): void
+    {
+        $this->default = $default;
+    }
+
+
 }
