@@ -20,12 +20,12 @@ final class Version20250214182602 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE settings_lmm ADD `default` TINYINT(1) NOT NULL');
+        $this->addSql('ALTER TABLE settings_lmm ADD `is_default` TINYINT(1) NOT NULL');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE settings_lmm DROP `default`');
+        $this->addSql('ALTER TABLE settings_lmm DROP `is_default`');
     }
 }

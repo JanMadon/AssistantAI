@@ -30,6 +30,19 @@ class SettingsLmmRepository extends ServiceEntityRepository
         $this->entityManager->flush();
     }
 
+    public function setDefaultSetting($id): void
+    {
+        /** @var SettingsLmm $setting */
+        foreach ($this->findAll() as $setting){
+            $setting->setDefault(false);
+            $this->entityManager->persist($setting);
+        }
+        $setting = $this->find($id);
+        $setting->setDefault(true);
+        $this->entityManager->persist($setting);
+        $this->entityManager->flush();
+    }
+
 
 
     //    /**

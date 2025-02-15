@@ -32,34 +32,45 @@
                 <div class="border-bottom p-3">
                     <label for="settingsChat"> Template Settings LMM </label>
                     <select id="settingsChat" class="form-select form-select-sm" aria-label="Default select example">
-                        {% for model in models %}
-                            <option id="{{ model.id }}" value="{{ model.id }}" {{ model == 'gpt-4o-mini' ? 'selected' : '' }} >{{ model.id }}</option>
+                        {% set defaultId = null %}
+                        {% for lmmSetting in lmmSettings %}
+                            {% if lmmSetting.default %}
+                            {% set defaultId = loop.index0 %}
+                            {% endif %}
+                            <option value="{{ lmmSetting.id }}" {{ lmmSetting.default ? 'selected' : '' }} data-default="{{ lmmSetting.default ? 'true' : 'false' }}">
+                                {{ lmmSetting.name }}
+                            </option>
                         {% endfor %}
                     </select>
+                    <div class="d-flex justify-content-end">
+                        <button hidden onclick="setDefaultTemplate(this)" id="saveAsDefaultBtn" type="button" class="btn btn-outline-primary mt-1" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">Set as default </button>
+                    </div>
                 </div>
                 <div class="border-bottom p-3">
                     <label for="modelSelektor"> Model </label>
                     <select id="modelSelektor" class="form-select form-select-sm" aria-label="Default select example">
                         {% for model in models %}
-                            <option id="{{ model.id }}" value="{{ model.id }}" {{ model == 'gpt-4o-mini' ? 'selected' : '' }} >{{ model.id }}</option>
+                            <option id="{{ model.id }}" value="{{ model.id }}" {{ lmmSettings[defaultId].modelId ? 'selected' : '' }} >{{ model.id }}</option>
                         {% endfor %}
                     </select>
                 </div>
+                {{ lmmSettings[defaultId].temperature }}
                 <div class="border-bottom p-3">
                     <div class="d-flex justify-content-between align-items-center w-min">
                         <label for="temperatureRange" class="form-label">Temperature</label>
                         <label for="temperatureNumber"></label>
                         <input type="number" class="form-control number-control form-control-sm w-25"
-                               id="temperatureNumber" min="0" max="2" step="0.01" value="1" disabled>
+                               id="temperatureNumber" min="0" max="2" step="0.01" value="{{ lmmSettings[defaultId].temperature }}" disabled>
                     </div>
                     <input type="range" class="form-range" id="temperatureRange" min="0" max="2" step="0.01">
                 </div>
                 <div class="border-bottom p-3">
+                                    {#todo param max tokern is not use to in request to llm model alredy#}
                     <div class="d-flex justify-content-between align-items-center w-min">
                         <label for="maxTokenRange" class="form-label">Max token</label>
                         <label for="maxTokenNumber"></label>
                         <input type="number" class="form-control number-control form-control-sm w-25"
-                               id="maxTokenNumber" min="0" max="2" step="0.01" value="1" disabled>
+                               id="maxTokenNumber" min="0" max="2" step="0.01" value="{{ lmmSettings[defaultId].maxToken }}" disabled>
                     </div>
                     <input type="range" class="form-range" id="maxTokenRange" min="0" max="2" step="0.01">
                 </div>
@@ -133,6 +144,26 @@
                     alert('Saved')
                 })
                 .catch(error => {
+                    console.error(error)
+                })
+        }
+
+        /** SAVE TEMPLATE AS DEFAULT */
+        document.getElementById('settingsChat').addEventListener('change', function () {
+            document.getElementById('saveAsDefaultBtn').removeAttribute('hidden')
+        })
+
+         function setDefaultTemplate(el) {
+            let data = { 'id': document.getElementById('settingsChat').value }
+
+            axios.post("{{ path('assistent_save_setting_default') }}", data)
+                .then(response => {
+                    el.setAttribute('hidden', 'hidden')
+                    console.log(response)
+
+                })
+                .catch(error => {
+                    alert('Error')
                     console.error(error)
                 })
         }

@@ -26,7 +26,7 @@ class SettingsLmm
     private ?string $model_id = null;
 
     #[ORM\Column]
-    private bool $default = false;
+    private bool $is_default = false;
 
     public function getId(): ?int
     {
@@ -83,12 +83,12 @@ class SettingsLmm
 
     public function isDefault(): bool
     {
-        return $this->default;
+        return $this->is_default;
     }
 
     public function setDefault(bool $default): void
     {
-        $this->default = $default;
+        $this->is_default = $default;
     }
 
 

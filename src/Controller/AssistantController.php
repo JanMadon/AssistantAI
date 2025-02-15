@@ -25,6 +25,7 @@ class AssistantController extends AbstractController
         private readonly GPTservice $gptService,
         private readonly ConversationRepository $conversationRepository,
         private readonly TemplateRepository $templateRepository,
+        private readonly SettingsLmmRepository $settingsLmmRepository,
         private readonly ValidatorService $validatorService
     ){}
 
@@ -34,13 +35,27 @@ class AssistantController extends AbstractController
 
         $conversations = $this->conversationRepository->findBy([], ['id' => 'DESC']);
         $conversationsJson = $serializer->serialize($conversations, 'json', ['groups' => 'conversation']);
-        $templates = $this->templateRepository->findBy([], ['id' => 'DESC']);;
         return $this->render('assistant/main.html.twig', [
             'conversations' => $conversations,
             'conversationsJson' => $conversationsJson,
-            'templates' => $templates,
+            'templates' => $this->templateRepository->findBy([], ['id' => 'DESC']),
             'models' => $this->gptService->getChatModels(),
+            'lmmSettings' => $this->settingsLmmRepository->findAll(),
         ]);
+    }
+
+    #[Route('/api/assistant', 'assistant_data', methods: ['POST'])]
+    public function assistantData(Request $request, SerializerInterface $serializer): Response
+    {
+        $templatePage = $request->get('template_page', 1);
+        $templatePerPage = $request->get('template_per_page', 10);
+
+        $lastConversationPage = $request->get('last_conv_page', 1);
+        $lastConversationPerPage = $request->get('last_conv_limit', 10);
+
+       return new JsonResponse([
+
+       ]);
     }
 
     #[Route('/api/assistant/prompt', 'assistent_prompt', methods:['POST'])]
@@ -85,7 +100,7 @@ class AssistantController extends AbstractController
     }
 
     #[Route('/api/assistant/save/chat-settings', 'assistent_save_settings', methods:['POST'])]
-    public function saveChatSettings(Request $request, SettingsLmmRepository $settingsLmmRepository): Response
+    public function saveChatSettings(Request $request): Response
     {
         $requestData = json_decode($request->getContent());
 
@@ -100,8 +115,20 @@ class AssistantController extends AbstractController
             $requestData->maxToken ?? null,
         );
         $this->validatorService->validateAndThrow($settings);
+        $this->settingsLmmRepository->saveSettings($settings);
 
-        $settingsLmmRepository->saveSettings($settings);
+        return new JsonResponse(['status' => 'ok']);
+    }
+
+    #[Route('/api/assistant/save/chat-settings/default', 'assistent_save_setting_default', methods:['POST'])]
+    public function saveTemplateAsDefault(Request $request, SettingsLmmRepository $settingsLmmRepository): Response
+    {
+        $requestData = json_decode($request->getContent());
+        if ($requestData === null) {
+            return new JsonResponse(['error' => 'Invalid JSON.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $this->settingsLmmRepository->setDefaultSetting($requestData->id);
 
         return new JsonResponse(['status' => 'ok']);
     }
