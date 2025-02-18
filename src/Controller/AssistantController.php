@@ -1,6 +1,7 @@
 <?php
 namespace App\Controller;
 
+use App\DTO\LMM\PromptDto;
 use App\DTO\LMM\SettingLmmDto;
 use App\DTO\LMM\TemplateLmmDto;
 use App\Repository\ConversationRepository;
@@ -8,7 +9,7 @@ use App\Repository\LMM\SettingsLmmRepository;
 use App\Repository\TemplateRepository;
 use App\Service\Chat\ConversationService;
 use App\Service\Chat\MessageService;
-use App\Service\GPTservice;
+use App\Service\LMM\OpenAi\OpenAiChatClient;
 use App\Service\Validators\ValidatorService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

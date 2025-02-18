@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\LMM\OpenAi;
 
-use App\Service\LMM\ChatLmmService;
+use App\Service\LMM\ChatClinetInterface;
 use App\ValueObjects\LLM\ChatModel;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpClient\Exception\ClientException;
@@ -14,7 +14,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 
-class GPTservice implements ChatLmmService
+class OpenAiChatClient implements ChatClinetInterface
 {
 
     private string $url = 'https://api.openai.com/v1/chat/completions';

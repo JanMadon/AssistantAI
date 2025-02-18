@@ -5,30 +5,29 @@ declare(strict_types=1);
 namespace App\Service\Aidev3;
 
 
-use App\Service\GPTservice;
+use App\Service\LMM\OpenAi\OpenAiChatClient;
+use DOMDocument;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use DOMDocument;
 
 
 class AiDev3PreWorkService
 {
     private ParameterBagInterface $config;
     private HttpClientInterface $httpClient;
-    private GPTservice $gptService;
+    private OpenAiChatClient $gptService;
     private array $AiDevs3Endpoint;
     private CacheInterface $cache;
 
     public function __construct(
         ParameterBagInterface $config,
         HttpClientInterface   $httpClient,
-        GPTservice            $gptService,
+        OpenAiChatClient      $gptService,
         CacheInterface        $cache
     )
     {

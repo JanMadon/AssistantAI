@@ -4,7 +4,7 @@ namespace App\Service\LMM;
 
 use Doctrine\Common\Collections\Collection;
 
-interface ChatLmmService
+interface ChatClinetInterface
 {
     public function getChatModels(): array;
 }
