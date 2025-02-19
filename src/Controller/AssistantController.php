@@ -65,22 +65,21 @@ class AssistantController extends AbstractController
         ConversationService $conversationService,
         MessageService $messageService): Response
     {
-        // request {id,system, conversation, model}
         $requestData = json_decode($request->getContent());
-        $conversation = $conversationService->getOrCreateConversation($requestData);
-
-        $messageService->saveMessage($requestData, $conversation);
-
-        $answer = $this->gptService->prompt(
+        $promptDto = new PromptDto(
+            $requestData->id,
             $requestData->system,
-            $requestData->conversation,
+            $requestData->message->role,
+            $requestData->message->content,
             $requestData->model,
-            $requestData->config);
+            $requestData->config->temperature,
+        );
+        $this->validatorService->validateAndThrow($promptDto); // to powinno gdzieś gdzieś się znaleść
 
-        $messageService->saveMessage($answer, $conversation);
+        $conversation = $this->chatService->chat($promptDto);
 
         return new JsonResponse([
-            'answer' => $answer,
+            'answer' => $answer ?? null,
             'id' => $conversation->getId(),
         ], 200);
     }
