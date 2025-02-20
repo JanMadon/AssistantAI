@@ -23,7 +23,7 @@
                     <div class="input-group">
                         <label for="userInput"></label>
                         <textarea type="text" class="form-control" id="userInput" placeholder="Type your message..." onkeydown="checkEnter(event)"></textarea>
-                        <button class="btn btn-primary" type="button" onclick="sendMessage()">Send</button>
+                        <button class="btn btn-primary" type="button" onclick="sendLastMessage()">Send</button>
                     </div>
                 </div>
             </div>
@@ -50,11 +50,11 @@
                     <label for="modelSelektor"> Model </label>
                     <select id="modelSelektor" class="form-select form-select-sm" aria-label="Default select example">
                         {% for model in models %}
-                            <option id="{{ model.id }}" value="{{ model.id }}" {{ lmmSettings[defaultId].modelId ? 'selected' : '' }} >{{ model.id }}</option>
+                            <option id="{{ model.id }}" value="{{ model.id }}" {{ model.id == 'gpt-4o-mini'  ? 'selected' : '' }} >{{ model.id }}</option>
+{#                            <option id="{{ model.id }}" value="{{ model.id }}" {{ lmmSettings[defaultId].modelId ? 'selected' : '' }} >{{ model.id }}</option>#}
                         {% endfor %}
                     </select>
                 </div>
-                {{ lmmSettings[defaultId].temperature }}
                 <div class="border-bottom p-3">
                     <div class="d-flex justify-content-between align-items-center w-min">
                         <label for="temperatureRange" class="form-label">Temperature</label>
@@ -146,6 +146,7 @@
                 .catch(error => {
                     console.error(error)
                 })
+
         }
 
         /** SAVE TEMPLATE AS DEFAULT */
@@ -172,7 +173,7 @@
         /** SEND MESSAGE*/
         function checkEnter(event) {
             if (event.key === 'Enter') {
-                sendMessage()
+                sendLastMessage()
             }
         }
 
@@ -207,7 +208,61 @@
             })
         }
 
-        /** SEND MESSAGE BY AXIOS */
+        /** SEND SIMPLE USER MESSAGE */
+        async function sendLastMessage() {
+            if (!systemInput.value || !userInput.value) {
+                alert('Please enter system command or user message');
+                return;
+            }
+
+            !userInput.value ? alert('Please enter user message') : console.log('user: ' + userInput.value)
+
+            let chatBox = document.getElementById('chatBox');
+            let userMessage = document.createElement('div');
+            userMessage.className = 'conversation user'
+            userMessage.textContent = 'User: ' + userInput.value;
+            chatBox.appendChild(userMessage);
+
+            const data = {
+                'id': conversation_id,
+                'system': systemInput.value,
+                'message': {
+                    'role': 'User',
+                    'content': userInput.value,
+                },
+                'model': document.getElementById("modelSelektor").value ?? null,
+                'config': {
+                    'temperature': temperatureNumber.value,
+                    'max_token': 1000,
+                }
+            }
+            userInput.value = ''
+
+            let aiMessage = document.createElement('div');
+            aiMessage.className = 'conversation ai';
+            aiMessage.innerHTML = 'AI: ' + await requestChat(data);
+            chatBox.appendChild(aiMessage);
+            document.getElementById('userInput').value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        async function requestChat(data) {
+            console.log(JSON.stringify(data))
+
+            try {
+                const response = await axios.post("{{ path('assistant_prompt') }}", data)
+                conversation_id = response.data.id
+                return response.data.answer
+
+            } catch (error) {
+                console.error(error)
+                return  error
+            }
+        }
+
+
+
+        /** SEND ALL CONVERSATION MESSAGE BY AXIOS */
         async function sendMessage() {
             if (userInput.value.trim() !== '') {
                 let chatBox = document.getElementById('chatBox');
@@ -235,9 +290,9 @@
                 let $site = message.shift();
 
                 if ($site === 'User') {
-                    conversation.push({'User': message[0]})
+                    conversation.push({role: 'User', content: message[0]})
                 } else if ($site === 'AI') {
-                    conversation.push({'AI': message[0]})
+                    conversation.push({role: 'Assistant', content: message[0]})
                 } else {
                     console.error($site)
                 }
@@ -258,7 +313,7 @@
 
             console.log(JSON.stringify(data))
             try {
-                const response = await axios.post("{{ path('assistent_prompt') }}", data)
+                const response = await axios.post("{{ path('assistant_prompt') }}", data)
                 conversation_id = response.data.id
                 return response.data.answer
 
