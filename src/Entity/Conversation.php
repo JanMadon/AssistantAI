@@ -35,6 +35,18 @@ class Conversation
     #[MaxDepth(1)]
     private ?Collection $messages = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups('conversation')]
+    private ?string $model_id = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups('conversation')]
+    private ?string $temperature = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups('conversation')]
+    private ?string $max_token = null;
+
     public function __construct()
     {
         $this->messages = new ArrayCollection();
@@ -103,6 +115,38 @@ class Conversation
             }
         }
 
+        return $this;
+    }
+
+    public function getMessagesCount(): int
+    {
+        return $this->messages->count();
+    }
+    public function getModelId(): ?string
+    {
+        return $this->model_id;
+    }
+    public function setModelId(?string $model_id): static
+    {
+        $this->model_id = $model_id;
+        return $this;
+    }
+    public function getTemperature(): ?string
+    {
+        return $this->temperature;
+    }
+    public function setTemperature(?string $temperature): static
+    {
+        $this->temperature = $temperature;
+        return $this;
+    }
+    public function getMaxToken(): ?string
+    {
+        return $this->max_token;
+    }
+    public function setMaxToken(?string $max_token): static
+    {
+        $this->max_token = $max_token;
         return $this;
     }
 }
