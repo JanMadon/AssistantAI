@@ -2,8 +2,11 @@
 
 namespace App\Repository;
 
+use App\DTO\LMM\Prompt\PromptDto;
+use App\Entity\Conversation;
 use App\Entity\Message;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -11,10 +14,22 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class MessageRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry,  private readonly EntityManagerInterface $entityManager)
     {
         parent::__construct($registry, Message::class);
     }
+
+    public function createNewMessage(PromptDto $prompt, Conversation $conversation): void
+    {
+        $message = new Message();
+        $message->setConversation($conversation);
+        $message->setAuthor($prompt->role);
+        $message->setContent($prompt->content);
+        $this->entityManager->persist($message);
+        $this->entityManager->flush();
+        $conversation->addMessage($message);
+    }
+
 
     //    /**
     //     * @return Message[] Returns an array of Message objects

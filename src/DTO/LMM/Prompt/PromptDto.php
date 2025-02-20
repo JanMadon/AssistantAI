@@ -8,33 +8,41 @@ class PromptDto
 {
     //#[Assert\NotBlank]
     #[Assert\Type('int')]
-    public ?int $id;
+    public ?int $conversation_id;
     #[Assert\NotNull]
     #[Assert\NotBlank]
     #[Assert\Type('string')]
     public string $system_field;
 
-    /** @var array|MessageDto[]  */
     #[Assert\NotNull]
-    #[Assert\Type('array')]
-    public array $conversation;
+    #[Assert\NotBlank]
+    #[Assert\Type('string')]
+    public string $role;
+
+    #[Assert\NotNull]
+    #[Assert\NotBlank]
+    #[Assert\Type('string')]
+    public string $content;
 
     #[Assert\NotNull]
     #[Assert\Type('string')]
     public string $model;
 
     #[Assert\Type('float')]
-    public float $temperature; // todo its stdclass make dto or vo
+    public float $temperature;
 
-    public function __construct($id, $system_field, $conversation, $model, $temperature)
+    #[Assert\Type('numeric')]
+    public float $max_token;
+
+    public function __construct($conversation_id, $system_field, $role, $content, $model, $temperature, $max_token)
     {
-        $this->id = $id;
+        $this->conversation_id = $conversation_id;
         $this->system_field = $system_field;
+        $this->role = $role;
+        $this->content = $content;
         $this->model = $model;
         $this->temperature = $temperature;
-        $this->conversation = array_map(function($message) {
-            return new MessageDto($message->role, $message->content);
-        }, $conversation);;
+        $this->max_token = $max_token;
     }
 
 

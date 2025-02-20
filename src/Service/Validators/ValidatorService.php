@@ -26,6 +26,7 @@ class ValidatorService
         $errors = $this->validator->validate($object);
 
         if (count($errors) > 0) {
+            dump('ValidatorService -> EXCEPTION:'.  json_encode($this->formatErrors($errors))); // todo debug in php bin/console server:dump
             throw new BadRequestHttpException(json_encode($this->formatErrors($errors)));
         }
     }

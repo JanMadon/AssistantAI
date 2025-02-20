@@ -2,8 +2,10 @@
 
 namespace App\Repository;
 
+use App\DTO\LMM\Prompt\PromptDto;
 use App\Entity\Conversation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -11,7 +13,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ConversationRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, private readonly EntityManagerInterface $entityManager)
     {
         parent::__construct($registry, Conversation::class);
     }
@@ -54,5 +56,30 @@ class ConversationRepository extends ServiceEntityRepository
     {
         $entity = $this->findOneBy([], ['id' => 'DESC']);
         return $entity ? $entity->getId() : 0;
+    }
+
+    public function CreateNewConversation(PromptDto $prompt): Conversation
+    {
+        $conversation = new Conversation();
+        $conversation->setName($prompt->content);
+        $conversation->setSystemField($prompt->system_field);
+        $conversation->setModelId($prompt->model);
+        $conversation->setTemperature($prompt->temperature);
+        $conversation->setMaxToken($prompt->max_token);
+        $this->entityManager->persist($conversation);
+
+        return $conversation;
+    }
+
+    public function CreateAndSaveNewConversation(PromptDto $prompt): Conversation
+    {
+        $conversation = $this->CreateNewConversation($prompt);
+        $this->entityManager->flush();
+        return $conversation;
+    }
+
+    public function getConversationById($id): Conversation
+    {
+        return $this->find($id);
     }
 }

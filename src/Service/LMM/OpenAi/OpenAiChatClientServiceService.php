@@ -2,7 +2,9 @@
 
 namespace App\Service\LMM\OpenAi;
 
-use App\Service\LMM\ChatClinetInterface;
+use App\DTO\LMM\Prompt\PromptDto;
+use App\Entity\Conversation;
+use App\Service\LMM\ChatClientServiceInterface;
 use App\ValueObjects\LLM\ChatModel;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpClient\Exception\ClientException;
@@ -14,7 +16,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 
-class OpenAiChatClient implements ChatClinetInterface
+class OpenAiChatClientServiceService implements ChatClientServiceInterface
 {
 
     private string $url = 'https://api.openai.com/v1/chat/completions';
@@ -96,26 +98,33 @@ class OpenAiChatClient implements ChatClinetInterface
         return $this->gptRequest($payload);
     }
 
-    public function prompt(string $system, array|string $contents, string $model = 'gpt-3.5-turbo', $config = '')
+    public function prompt(Conversation $conversation): PromptDto
     {
-        $contents = $this->prepareConversationArray($contents);
-
         $payload = [
-            'model' => $model,
-            'messages' => [
-                [
+            'model' => $conversation->getModelId(),
+            'messages' => [[
                     'role' => 'system',
-                    'content' => $system
-                ],
-                ...$contents
-            ]
+                    'content' => $conversation->getSystemField(),
+                ], ...array_map(function($message) {
+                return [
+                    'role' => strtolower($message->getAuthor()) === 'user' ? 'user' : 'assistant',
+                    'content' => $message->getContent()
+                ];
+            }, $conversation->getMessages()->toArray())]
         ];
 
-        if(property_exists($config, 'temperature')){
-            $payload['temperature'] = (float) $config->temperature;
-        }
+        dump($payload);
 
-        return $this->gptRequest($payload);
+        return new PromptDto(
+            $conversation->getId(),
+            $conversation->getSystemField(),
+            'assistant',
+            $this->gptRequest($payload),
+            $conversation->getModelId(),
+            $conversation->getTemperature(),
+            $conversation->getMaxToken()
+        );
+
     }
 
     public function promptVisionModel(array $messages, string $model = 'gpt-4o-mini')

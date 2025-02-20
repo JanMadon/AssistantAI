@@ -1,15 +1,14 @@
 <?php
 namespace App\Controller;
 
-use App\DTO\LMM\PromptDto;
+use App\DTO\LMM\Prompt\PromptDto;
 use App\DTO\LMM\SettingLmmDto;
 use App\DTO\LMM\TemplateLmmDto;
 use App\Repository\ConversationRepository;
 use App\Repository\LMM\SettingsLmmRepository;
 use App\Repository\TemplateRepository;
-use App\Service\Chat\ConversationService;
-use App\Service\Chat\MessageService;
-use App\Service\LMM\OpenAi\OpenAiChatClient;
+use App\Service\Assistant\ChatService;
+use App\Service\LMM\OpenAi\OpenAiChatClientServiceService;
 use App\Service\Validators\ValidatorService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,11 +22,12 @@ use Symfony\Component\Serializer\SerializerInterface;
 class AssistantController extends AbstractController
 {
     public function __construct(
-        private readonly GPTservice $gptService,
-        private readonly ConversationRepository $conversationRepository,
-        private readonly TemplateRepository $templateRepository,
-        private readonly SettingsLmmRepository $settingsLmmRepository,
-        private readonly ValidatorService $validatorService
+        private readonly OpenAiChatClientServiceService $gptService,
+        private readonly ConversationRepository         $conversationRepository,
+        private readonly TemplateRepository             $templateRepository,
+        private readonly SettingsLmmRepository          $settingsLmmRepository,
+        private readonly ValidatorService               $validatorService,
+        private readonly ChatService                    $chatService,
     ){}
 
     #[Route('/assistant', 'assistant', methods: ['GET'])]
@@ -59,13 +59,11 @@ class AssistantController extends AbstractController
        ]);
     }
 
-    #[Route('/api/assistant/prompt', 'assistent_prompt', methods:['POST'])]
-    public function assistantConversation(
-        Request $request,
-        ConversationService $conversationService,
-        MessageService $messageService): Response
+    #[Route('/api/assistant/prompt', 'assistant_prompt', methods:['POST'])]
+    public function assistantConversation(Request $request): Response
     {
         $requestData = json_decode($request->getContent());
+
         $promptDto = new PromptDto(
             $requestData->id,
             $requestData->system,
@@ -73,14 +71,15 @@ class AssistantController extends AbstractController
             $requestData->message->content,
             $requestData->model,
             $requestData->config->temperature,
+            $requestData->config->max_token,
         );
-        $this->validatorService->validateAndThrow($promptDto); // to powinno gdzieś gdzieś się znaleść
+        $this->validatorService->validateAndThrow($promptDto);
 
-        $conversation = $this->chatService->chat($promptDto);
+        $responseChat = $this->chatService->chat($promptDto);
 
         return new JsonResponse([
-            'answer' => $answer ?? null,
-            'id' => $conversation->getId(),
+            'answer' => $responseChat->content,
+            'id' => $responseChat->conversation_id,
         ], 200);
     }
 
