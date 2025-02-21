@@ -29,6 +29,18 @@
             </div>
 
             <div class="col-2 border-start bg-secondary-subtle p-0">
+                <div class="border-bottom p-1">
+                    <p class="small m-0">Usage tokens </p>
+                    <div class="px-1 py-0 d-flex justify-content-between">
+                        <p class="small m-0">total: </p>
+                        <p id="total-prompt-num" class="small m-0">0</p>
+                    </div>
+                    <div class="px-1 py-0 m-0 d-flex justify-content-between">
+                        <p class="small m-0">last mes.: </p>
+                        <p id="last-prompt-num" class="small m-0">0</p>
+                    </div>
+                </div>
+
                 <div class="border-bottom p-3">
                     <label for="settingsChat"> Template Settings LMM </label>
                     <select id="settingsChat" class="form-select form-select-sm" aria-label="Default select example">
@@ -113,6 +125,7 @@
         let userInput = document.getElementById('userInput')
         let conversation = document.getElementById('chatBox')
         let conversation_id = null;
+        let totalTokenCounter = 0;
 
         const selectedChatModel = document.getElementById('modelSelektor')
         const modalSaveTemplate = document.getElementById('modal-save-settings')
@@ -251,7 +264,11 @@
 
             try {
                 const response = await axios.post("{{ path('assistant_prompt') }}", data)
+                console.log(response)
                 conversation_id = response.data.id
+                totalTokenCounter += response.data.usage_tokens.total
+                document.getElementById('total-prompt-num').textContent = totalTokenCounter
+                document.getElementById('last-prompt-num').textContent = response.data.usage_tokens.total
                 return response.data.answer
 
             } catch (error) {
