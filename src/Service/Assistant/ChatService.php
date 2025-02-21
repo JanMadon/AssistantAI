@@ -3,6 +3,7 @@
 namespace App\Service\Assistant;
 
 use App\DTO\LMM\Prompt\PromptDto;
+use App\DTO\LMM\Prompt\ResponseLmmDto;
 use App\Repository\ConversationRepository;
 use App\Repository\MessageRepository;
 use App\Service\LMM\ChatClientServiceInterface;
@@ -14,11 +15,11 @@ class ChatService
         private readonly EntityManagerInterface     $entityManager,
         private readonly ConversationRepository     $conversationRepository,
         private readonly MessageRepository          $messageRepository,
-        private readonly ChatClientServiceInterface $chatClinetService,
+        private readonly ChatClientServiceInterface $chatClientService,
 
     ) {}
 
-    public function chat(PromptDto $promptDto): PromptDto
+    public function chat(PromptDto $promptDto): ResponseLmmDto
     {
 
         if($promptDto->conversation_id === null){
@@ -27,12 +28,12 @@ class ChatService
             $conversation = $this->conversationRepository->getConversationById($promptDto->conversation_id);
         }
 
-        $this->messageRepository->createNewMessage($promptDto, $conversation);
+        $this->messageRepository->createNewMessage($conversation, $promptDto->role, $promptDto->content);
         $this->entityManager->flush();
-        $chatRes = $this->chatClinetService->prompt($conversation);
-        $this->messageRepository->createNewMessage($chatRes, $conversation);
+        $gptRes = $this->chatClientService->prompt($conversation);
+        $this->messageRepository->createNewMessage($conversation, $gptRes->role, $gptRes->content);
 
-        return $chatRes;
+        return $gptRes;
     }
 
 }

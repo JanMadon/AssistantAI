@@ -79,7 +79,12 @@ class AssistantController extends AbstractController
 
         return new JsonResponse([
             'answer' => $responseChat->content,
-            'id' => $responseChat->conversation_id,
+            'id' => $responseChat->forConversation->getId(),
+            'usage_tokens' => [
+                'prompt' => $responseChat->prompt_tokens,
+                'complication' => $responseChat->completion_tokens,
+                'total' => $responseChat->total_tokens
+            ]
         ], 200);
     }
 

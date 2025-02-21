@@ -3,6 +3,7 @@
 namespace App\Service\LMM\OpenAi;
 
 use App\DTO\LMM\Prompt\PromptDto;
+use App\DTO\LMM\Prompt\ResponseLmmDto;
 use App\Entity\Conversation;
 use App\Service\LMM\ChatClientServiceInterface;
 use App\ValueObjects\LLM\ChatModel;
@@ -98,7 +99,7 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
         return $this->gptRequest($payload);
     }
 
-    public function prompt(Conversation $conversation): PromptDto
+    public function prompt(Conversation $conversation): ResponseLmmDto
     {
         $payload = [
             'model' => $conversation->getModelId(),
@@ -113,16 +114,17 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
             }, $conversation->getMessages()->toArray())]
         ];
 
-        dump($payload);
+        $response = $this->gptRequest($payload);
 
-        return new PromptDto(
-            $conversation->getId(),
-            $conversation->getSystemField(),
-            'assistant',
-            $this->gptRequest($payload),
-            $conversation->getModelId(),
-            $conversation->getTemperature(),
-            $conversation->getMaxToken()
+        return new ResponseLmmDto(
+            $conversation,
+            $response->id ?? 'error',
+            $response->choices[0]->message->role ?? 'error',
+            $response->choices[0]->message->content ?? 'error',
+            $response->model ?? 'error',
+            $response->usage->prompt_tokens ?? 0,
+            $response->usage->completion_tokens ?? 0,
+            $response->usage->total_tokens?? 0,
         );
 
     }
@@ -317,10 +319,10 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
 
     /**
      * @param array $payload
-     * @return string
+     * @return object
      * @throws TransportExceptionInterface
      */
-    public function gptRequest(array $payload): string
+    public function gptRequest(array $payload)
     {
         try {
             $request = $this->httpClient->request(
@@ -336,11 +338,9 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
                     ]
                 ]
             );
-            $response = json_decode($request->getContent(false));
-            if(!isset($response->choices[0]->message->content)){
-               dd($response);
-            }
-            $response = $response->choices[0]->message->content;
+
+            return json_decode($request->getContent(false));
+
         } catch (ClientException $exception) {
             $response = $exception->getMessage();
         } catch (HttpExceptionInterface $exception) {
