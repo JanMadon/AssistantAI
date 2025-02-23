@@ -34,15 +34,23 @@ class PromptDto
     #[Assert\Type('numeric')]
     public float $max_token;
 
-    public function __construct($conversation_id, $system_field, $role, $content, $model, $temperature, $max_token)
+    #[Assert\Type('bool')]
+    public bool $is_function_calling = false;
+
+    public array $functions;
+
+    public array $function_arguments;
+
+    public function __construct($conversation_id, $system_field, $role, $content, $model, $temperature, $max_token, $function_calling = false)
     {
         $this->conversation_id = $conversation_id;
         $this->system_field = $system_field;
-        $this->role = $role;
+        $this->role = strtolower($role);
         $this->content = $content;
         $this->model = $model;
         $this->temperature = $temperature;
         $this->max_token = $max_token;
+        $this->is_function_calling = $function_calling;
     }
 
 
