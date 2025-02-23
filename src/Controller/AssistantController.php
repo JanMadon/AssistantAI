@@ -72,6 +72,7 @@ class AssistantController extends AbstractController
             $requestData->model,
             $requestData->config->temperature,
             $requestData->config->max_token,
+            $requestData->config->function_calling,
         );
         $this->validatorService->validateAndThrow($promptDto);
 

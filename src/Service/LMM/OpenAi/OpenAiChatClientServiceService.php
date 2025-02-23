@@ -9,6 +9,7 @@ use App\Service\LMM\ChatClientServiceInterface;
 use App\ValueObjects\LLM\ChatModel;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpClient\Exception\ClientException;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -21,49 +22,54 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
 {
 
     private string $url = 'https://api.openai.com/v1/chat/completions';
-    //private string $model;
-    private ParameterBagInterface $config;
-    private HttpClientInterface $httpClient;
+    private string $projectDir;
 
 
-    public function __construct(ParameterBagInterface $config, HttpClientInterface $httpClient)
+    public function __construct(
+        private readonly  ParameterBagInterface $config,
+        private readonly HttpClientInterface $httpClient,
+        KernelInterface $kernel
+    )
     {
-        //$this->model = $model;
-        $this->config = $config;
-        $this->httpClient = $httpClient;
+        $this->projectDir = $kernel->getProjectDir();
     }
 
-    public function functionCalling(string $userPrompt, string $system, array $functions,string $model = 'gpt-4o-mini', string $function_call='auto'): Object|string
+    public function functionCalling(PromptDto $prompt): ResponseLmmDto
     {
         $payload = [
-            'model' => $model,
+            'model' => $prompt->model,
             'messages' => [
-                ['role' => 'system', 'content' => $system],
-                ['role' => 'user', 'content' => $userPrompt]
-            ],
-            'functions' => $functions,
-            'function_call' => $function_call
-        ];
-
-        $request = $this->httpClient->request(
-            'POST',
-            $this->url,
-            [
-                'json' => $payload,
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
-                    'Content-Length: ' . strlen(json_encode($payload)),
-                    'Authorization' => 'Bearer ' . $this->config->get('API_KEY_OPENAI')
+                [
+                    'role' => 'system',
+                    'content' => $prompt->system_field
+                ],
+                [   'role' => 'user',
+                    'content' => $prompt->content
                 ]
-            ]
+            ],
+            'functions' => $prompt->functions,
+            'function_call' => 'auto',
+        ];
+        $responseLmm = $this->gptRequest($payload);
+        dump($responseLmm);
+        $response = new ResponseLmmDto(
+            null,
+            $responseLmm->id ?? 'error',
+            $responseLmm->choices[0]->message->role ?? 'error',
+            $responseLmm->choices[0]->message->content ?? 'empty',
+            $responseLmm->model ?? 'error',
+            $responseLmm->usage->prompt_tokens ?? 0,
+            $responseLmm->usage->completion_tokens ?? 0,
+            $responseLmm->usage->total_tokens?? 0,
         );
-        $response = json_decode($request->getContent(false));
-        if(isset($response->choices[0]->message->function_call)){
-            return $response->choices[0]->message->function_call;
-        } else{
-            return $response->choices[0]->message->content;
-        }
+        $response->use_function = $responseLmm->choices[0]->message->function_call->name ?? null;
+        $response->function_arguments = json_decode(
+            $responseLmm->choices[0]->message->function_call->arguments,
+            true)
+            ?? [];
+
+        return $response;
+
 
     }
 
@@ -127,6 +133,39 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
             $response->usage->total_tokens?? 0,
         );
 
+    }
+
+    public function promptVisionModelWithUrlImage(promptDto $promptDto): ResponseLmmDto
+    {
+        $payload = [
+            'model' => $promptDto->model,
+            'messages' => [
+                [
+                    'role' => 'user',
+                    'content' => [
+                        [
+                            'type' => 'text',
+                            'text' => $promptDto->content
+                        ],
+                        [
+                            'type' => 'image_url',
+                            'image_url' => ['url' => $promptDto->function_arguments['url']]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $responseLmm = $this->gptRequest($payload);
+        return new ResponseLmmDto(
+            null,
+            $responseLmm->id ?? 'error',
+            $responseLmm->choices[0]->message->role ?? 'error',
+            $responseLmm->choices[0]->message->content ?? 'empty',
+            $responseLmm->model ?? 'error',
+            $responseLmm->usage->prompt_tokens ?? 0,
+            $responseLmm->usage->completion_tokens ?? 0,
+            $responseLmm->usage->total_tokens?? 0,
+        );
     }
 
     public function promptVisionModel(array $messages, string $model = 'gpt-4o-mini')

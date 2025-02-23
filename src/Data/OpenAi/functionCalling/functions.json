@@ -1,0 +1,34 @@
+[
+  {
+    "name": "transcription",
+    "description": "Converts an MP3 file into text.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "Url to the MP3."
+        }
+      },
+      "required": [
+        "url"
+      ]
+    }
+  },
+  {
+    "name": "image_to_text",
+    "description": "Describe an image.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "Url to the image."
+        }
+      },
+      "required": [
+        "url"
+      ]
+    }
+  }
+]
