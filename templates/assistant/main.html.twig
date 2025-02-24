@@ -13,6 +13,15 @@
                     <label for="systemInput"></label>
                     <textarea style="height: 300px;" class="form-control d-inline-block" id="systemInput" placeholder="Enter system command or info"></textarea>
                 </div>
+                <div class="flex mb-3 mt-2">
+                    <label for="formFileSm" class="form-label">Small file input example</label>
+                    <input class="form-control form-control-sm" id="formFileSm" type="file" accept=".mp3,audio/mpeg">
+                    <button class="btn btn-primary btn-sm" type="button" onclick="setFile()">Send file</button>
+                </div>
+                <div class="form-check form-switch mt-5">
+                    <label class="form-check-label" for="use-function-calling">Use function calling</label>
+                    <input class="form-check-input" type="checkbox" role="switch" id="use-function-calling">
+                </div>
             </div>
 
             <div class="chat col d-flex flex-column justify-content-between mt-2">
@@ -183,7 +192,7 @@
         }
 
 
-        /** SEND MESSAGE*/
+        /** SEND MESSAGE BY ENTER KEY*/
         function checkEnter(event) {
             if (event.key === 'Enter') {
                 sendLastMessage()
@@ -220,6 +229,37 @@
                 conversation.appendChild(messageField);
             })
         }
+
+
+        function setFile() {
+            const fileInput = document.querySelector('#formFileSm');
+
+            if (fileInput.files.length === 0) {
+                alert('Wybierz plik przed wysłaniem!');
+                return;
+            }
+
+            console.log(fileInput.files[0].name)
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            axios.post("{{ path('assistant_prompt_file') }}", formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+                .then(response => {
+                    console.log('Added file successful:', response.data);
+                    alert('Added file successful');
+                })
+                .catch(error => {
+                    console.error('error', error);
+                    alert('Something went wrong. Please try again later.');
+                });
+        }
+
+
 
         /** SEND SIMPLE USER MESSAGE */
         async function sendLastMessage() {

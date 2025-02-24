@@ -89,6 +89,19 @@ class AssistantController extends AbstractController
         ], 200);
     }
 
+    #[Route('/api/assistant/prompt/file', name:'assistant_prompt_file', methods:['POST'])]
+    public function addFile(Request $request): Response
+    {
+        $file = $request->files->get('file');
+        $uploadDirectory = $this->getParameter('kernel.project_dir') . '/public/uploads';
+        try {
+            $file->move($uploadDirectory, $file->getClientOriginalName());
+        } catch (\Exception $e) {
+            return new JsonResponse(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
+        return new JsonResponse(['status' => 'ok'], 200);
+    }
+
     #[Route('/api/assistant/template', 'template_save', methods:['POST'])]
     public function saveTemplate(Request $request): Response
     {
