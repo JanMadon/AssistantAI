@@ -3,28 +3,26 @@
 namespace App\Command;
 
 use App\Service\Aidev3\AiDev3PreWorkService;
-use App\Service\GPTservice;
-use Symfony\Component\Console\Command\Command;
+use App\Service\LMM\OpenAi\OpenAiChatClientServiceService;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 
 #[AsCommand(name: 'app:makeTranscription', description: 'Make Transcription')]
 class MakeTranscriptionCommand extends Command
 {
 
-    private GPTservice $GPTservice;
+    private OpenAiChatClientServiceService $GPTservice;
     private AiDev3PreWorkService $aiDev3PreWorkService;
     private mixed $aiDevs3Endpoint;
 
     public function __construct(
-        GPTservice $GPTservice,
-        AiDev3PreWorkService $aiDev3PreWorkService,
-        ParameterBagInterface $parameterBag,
+        OpenAiChatClientServiceService $GPTservice,
+        AiDev3PreWorkService           $aiDev3PreWorkService,
+        ParameterBagInterface          $parameterBag,
     )
     {
         parent::__construct();

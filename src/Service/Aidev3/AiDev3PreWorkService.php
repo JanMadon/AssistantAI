@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Service\Aidev3;
 
 
-use App\Service\LMM\OpenAi\OpenAiChatClient;
+use App\Service\LMM\OpenAi\OpenAiChatClientServiceService;
 use DOMDocument;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -20,15 +20,15 @@ class AiDev3PreWorkService
 {
     private ParameterBagInterface $config;
     private HttpClientInterface $httpClient;
-    private OpenAiChatClient $gptService;
+    private OpenAiChatClientServiceService $gptService;
     private array $AiDevs3Endpoint;
     private CacheInterface $cache;
 
     public function __construct(
-        ParameterBagInterface $config,
-        HttpClientInterface   $httpClient,
-        OpenAiChatClient      $gptService,
-        CacheInterface        $cache
+        ParameterBagInterface          $config,
+        HttpClientInterface            $httpClient,
+        OpenAiChatClientServiceService $gptService,
+        CacheInterface                 $cache
     )
     {
         $this->config = $config;

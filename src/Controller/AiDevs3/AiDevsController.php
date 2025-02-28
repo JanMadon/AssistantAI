@@ -3,7 +3,7 @@
 namespace App\Controller\AiDevs3;
 
 use App\Service\Aidev3\AiDev3PreWorkService;
-use App\Service\LMM\OpenAi\OpenAiChatClient;
+use App\Service\LMM\OpenAi\OpenAiChatClientServiceService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,13 +16,13 @@ class AiDevsController extends AbstractController
     private ParameterBagInterface $config;
     private HttpClientInterface $httpClient;
     private AiDev3PreWorkService $aiDevsService;
-    private OpenAiChatClient $gptService;
+    private OpenAiChatClientServiceService $gptService;
 
     public function __construct(
         ParameterBagInterface $config,
         HttpClientInterface   $httpClient,
         AiDev3PreWorkService  $aiDevsService,
-        OpenAiChatClient $gptService
+        OpenAiChatClientServiceService $gptService
     )
     {
         $this->config = $config;

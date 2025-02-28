@@ -3,7 +3,7 @@
 namespace App\Command\AiDevs3Tasks;
 
 use App\Service\Aidev3\AiDev3PreWorkService;
-use App\Service\GPTservice;
+use App\Service\LMM\OpenAi\OpenAiChatClientServiceService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -13,7 +13,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 abstract class BaseCommand extends Command
 {
-    protected GPTservice $GPTservice;
+    protected OpenAiChatClientServiceService $GPTservice;
     protected AiDev3PreWorkService $aiDev3PreWorkService;
     protected array $aiDevs3Endpoint;
     protected HttpClientInterface $httpClient;
@@ -21,11 +21,11 @@ abstract class BaseCommand extends Command
     protected ParameterBagInterface $envParma;
 
     public function __construct(
-        GPTservice $GPTservice,
-        AiDev3PreWorkService $aiDev3PreWorkService,
-        ParameterBagInterface $parameterBag,
-        HttpClientInterface $httpClient,
-        CacheInterface $cache
+        OpenAiChatClientServiceService $GPTservice,
+        AiDev3PreWorkService           $aiDev3PreWorkService,
+        ParameterBagInterface          $parameterBag,
+        HttpClientInterface            $httpClient,
+        CacheInterface                 $cache
     )
     {
         parent::__construct();

@@ -283,10 +283,12 @@
                     'role': 'User',
                     'content': userInput.value,
                 },
+                'file': document.querySelector('#formFileSm').files[0].name ?? null,
                 'model': document.getElementById("modelSelektor").value ?? null,
                 'config': {
                     'temperature': temperatureNumber.value,
                     'max_token': 1000,
+                    'function_calling': document.getElementById("use-function-calling").checked ?? false
                 }
             }
             userInput.value = ''

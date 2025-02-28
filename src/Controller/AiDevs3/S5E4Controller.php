@@ -3,7 +3,7 @@
 namespace App\Controller\AiDevs3;
 
 use App\Service\Aidev3\AiDev3PreWorkService;
-use App\Service\GPTservice;
+use App\Service\LMM\OpenAi\OpenAiChatClientServiceService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,18 +13,18 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class S5E4Controller extends AbstractController
 {
-    protected GPTservice $GPTservice;
+    protected OpenAiChatClientServiceService $GPTservice;
     protected AiDev3PreWorkService $aiDev3PreWorkService;
     protected array $aiDevs3Endpoint;
     protected HttpClientInterface $httpClient;
     protected ParameterBagInterface $envParma;
 
     public function __construct(
-        GPTservice $GPTservice,
-        AiDev3PreWorkService $aiDev3PreWorkService,
-        ParameterBagInterface $parameterBag,
-        HttpClientInterface $httpClient,
-        CacheInterface $cache
+        OpenAiChatClientServiceService $GPTservice,
+        AiDev3PreWorkService           $aiDev3PreWorkService,
+        ParameterBagInterface          $parameterBag,
+        HttpClientInterface            $httpClient,
+        CacheInterface                 $cache
     )
     {
         $this->GPTservice = $GPTservice;
@@ -171,7 +171,7 @@ class S5E4Controller extends AbstractController
                     "required" => ["file_path"]
                 ]
             ]
-            ];
+        ];
     }
 
     private function prepareMessage($prompt, $imageUrl)
