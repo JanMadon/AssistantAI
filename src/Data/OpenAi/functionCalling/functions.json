@@ -1,17 +1,33 @@
 [
   {
     "name": "transcription",
-    "description": "Converts an MP3 file into text.",
+    "description": "Converts an audio file into text.",
     "parameters": {
       "type": "object",
       "properties": {
-        "url": {
+        "file_name": {
           "type": "string",
-          "description": "Url to the MP3."
+          "description": "File name."
         }
       },
       "required": [
-        "url"
+        "file_name"
+      ]
+    }
+  },
+  {
+    "name": "text_to_speech",
+    "description": "Converts text to audio",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "text to converting"
+        }
+      },
+      "required": [
+        "text"
       ]
     }
   },

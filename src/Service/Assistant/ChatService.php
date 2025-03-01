@@ -87,18 +87,31 @@ class ChatService
     }
 
     /* Methods defined in src/Data/OpenAi/functionCalling/functions.json **/
-    public function image_to_text(array $url): string
+    private function image_to_text(array $arg): string
     {
-        $this->promptDto->function_arguments = $url;
+        $this->promptDto->function_arguments = $arg;
         $res = $this->chatClientService->promptVisionModelWithUrlImage($this->promptDto);
 
         return $res->content;
     }
 
-    public function transcription(array $url): string
+    private function transcription(array $arg) : string
     {
-        // todo to implemented
-        return '';
+        $filePath = $this->kernel->getProjectDir().'/public/uploads/' . $arg['file_name'];
+        $res = $this->chatClientService->makeTranscription($filePath);
+
+        return $res ?? 'error returning transcription';
+    }
+
+    private function text_to_speech(array $arg) : string
+    {
+        $savePath = $this->kernel->getProjectDir().'/public/storage/audio/tts/speech.mp3';
+        $text = $arg['text'];
+
+        $res = $this->chatClientService->createSpeech($text, $savePath);
+
+
+        return 'text_to_speech';
     }
 
 

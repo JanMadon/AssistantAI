@@ -276,21 +276,28 @@
             userMessage.textContent = 'User: ' + userInput.value;
             chatBox.appendChild(userMessage);
 
+            console.log('test')
+            let fileName = document.querySelector('#formFileSm')?.files[0]?.name ?? null
+
             const data = {
                 'id': conversation_id,
                 'system': systemInput.value,
                 'message': {
                     'role': 'User',
-                    'content': userInput.value,
+                    'content': userInput.value + (fileName ? ` [file_name: ${fileName}]` : ''),
                 },
-                'file': document.querySelector('#formFileSm').files[0].name ?? null,
+                'file': fileName,
                 'model': document.getElementById("modelSelektor").value ?? null,
                 'config': {
                     'temperature': temperatureNumber.value,
                     'max_token': 1000,
                     'function_calling': document.getElementById("use-function-calling").checked ?? false
+                },
+                'additional': {
+                    'file_name': fileName
                 }
             }
+
             userInput.value = ''
 
             let aiMessage = document.createElement('div');

@@ -8,6 +8,7 @@ use App\Entity\Conversation;
 use App\Service\LMM\ChatClientServiceInterface;
 use App\ValueObjects\LLM\ChatModel;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -21,7 +22,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class OpenAiChatClientServiceService implements ChatClientServiceInterface
 {
 
-    private string $url = 'https://api.openai.com/v1/chat/completions';
+    const URL_OPENAI = [
+        'standard' => 'https://api.openai.com/v1/chat/completions',
+        'whisper' => 'https://api.openai.com/v1/audio/transcriptions',
+        'speech' => 'https://api.openai.com/v1/audio/speech'
+    ];
+
     private string $projectDir;
 
 
@@ -202,33 +208,6 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
         return $this->gptRequest($payload);
     }
 
-    public function makeTranscription(string $filePath): string
-    {
-        try{
-            $response = $this->httpClient->request(
-                'POST',
-                'https://api.openai.com/v1/audio/transcriptions',
-                [
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $this->config->get('API_KEY_OPENAI'),
-                        'Content-Type' => ' multipart/form-data'
-                    ],
-                    'body' => [
-                        'file' => fopen($filePath, 'r'),
-                        'model' => 'whisper-1'
-                    ]
-                ]
-
-            );
-            $response = $response->getContent(false);
-        } catch (ClientExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $e) {
-            $response = $e->getMessage();
-        }
-        return $response;
-    }
-
-
-
     public function imageGeneration($prompt)
     {
         $payload = [
@@ -356,12 +335,84 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
         return $preparedConversation;
     }
 
+
+    public function createSpeech(string $text, string $savePath): ?string
+    {
+        $filesystem = new Filesystem();
+
+        try{
+            $response = $this->httpClient->request(
+                'POST',
+                self::URL_OPENAI['speech'],
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->config->get('API_KEY_OPENAI'),
+                        'Content-Type' => ' application/json'
+                    ],
+                    'json' => [
+                        'model' => 'tts-1',
+                        'input' => $text,
+                        'voice' => 'alloy'
+                    ]
+                ]
+
+            );
+            $speech = $response->getContent(false);
+            $directory = pathinfo($savePath, PATHINFO_DIRNAME);
+
+            if (!$filesystem->exists($directory)) { // create dir if not exist
+                $filesystem->mkdir($directory, 0755);
+            }
+
+            file_put_contents($savePath, $speech);
+
+            return $savePath;
+
+        } catch (\Throwable $exception) {
+            $response = $exception->getMessage();
+        }
+        return $response;
+    }
+
+
+    /**
+     * DOC OPEN_AI: https://platform.openai.com/docs/api-reference/audio/createTranscription
+     * @param string $filePath
+     * @return string|null
+     */
+    public function makeTranscription(string $filePath): ?string
+    {
+        try{
+            $response = $this->httpClient->request(
+                'POST',
+                self::URL_OPENAI['whisper'],
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->config->get('API_KEY_OPENAI'),
+                        'Content-Type' => ' multipart/form-data'
+                    ],
+                    'body' => [
+                        'file' => fopen($filePath, 'r'),
+                        'model' => 'whisper-1'
+                    ]
+                ]
+
+            );
+            $responseJson = $response->getContent(false);
+            return json_decode($responseJson)->text;
+        } catch (ClientExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $e) {
+            $response = $e->getMessage();
+        }
+        return $response;
+    }
+
+
     /**
      * @param array $payload
-     * @return object
+     * @return object|string
      * @throws TransportExceptionInterface
      */
-    public function gptRequest(array $payload)
+    private function gptRequest(array $payload): object|string
     {
         try {
             $request = $this->httpClient->request(
