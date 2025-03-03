@@ -1,0 +1,12 @@
+<?php
+declare(strict_types=1);
+
+namespace App\DesignPatterns\Creational\AbstractFactory;
+
+final class VeganBreakfast implements BreakfastInterface
+{
+    public function shouldAddVitaminB12Supplement(): true
+    {
+        return true;
+    }
+}
