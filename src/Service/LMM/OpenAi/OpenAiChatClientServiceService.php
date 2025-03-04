@@ -125,6 +125,14 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
                 ];
             }, $conversation->getMessages()->toArray())]
         ];
+        // todo use builder to make payload ??
+        if($conversation->getMaxToken()){
+            $payload['max_tokens'] = $conversation->getMaxToken();
+        }
+
+        if($conversation->getTemperature()){
+            $payload['temperature'] = $conversation->getTemperature();
+        }
 
         $response = $this->gptRequest($payload);
 
