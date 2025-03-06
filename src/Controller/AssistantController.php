@@ -15,6 +15,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedJsonResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -152,22 +154,32 @@ class AssistantController extends AbstractController
         return new JsonResponse(['status' => 'ok']);
     }
 
-    #[Route('/api/assistant/test', 'assistent_testt')]
-    public function onlyAssistantConversation(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/api/assistant/test', 'test-stream')]
+    public function streamAction(): StreamedResponse
     {
-        // request {id,system, conversation}
-        $request = json_decode($request->getContent(), true);
-        $messageUser = end($request['conversation']);
-        $conversationId = $request['id'] ?? null;
+        // !!!!! note it doesn't work with development server, I used nginx
+        $data = [
+            ['id' => 1, 'name' => 'John Doe'],
+            ['id' => 2, 'name' => 'Jane Doe'],
+            ['id' => 3, 'name' => 'Mary Smith'],
+            ['id' => 3, 'name' => 'Mary Smith'],
+            ['id' => 3, 'name' => 'Mary Smith'],
+            ['id' => 3, 'name' => 'Mary Smith'],
+            ['id' => 3, 'name' => 'Mary Smith'],
+        ];
 
+        return new StreamedResponse(function () use ($data) {
+            // Stream each JSON object one at a time
+            foreach ($data as $item) {
+                echo json_encode($item) . "\n";
+                // Flush output buffer to ensure data is sent immediately
+                flush();
+                sleep(1);
+            }
+        }, 200, [
+            'Content-Type' => 'application/json',
+            'X-Accel-Buffering' => 'no',
+        ]);
 
-
-        $answer = $this->gptService->prompt('gpt-3.5-turbo', $request['system'], $request['conversation']);
-        print_r($answer);
-
-        return new JsonResponse([
-            'answer' => $answer,
-            'id' => $conversationId,
-        ], 200);
     }
 }
