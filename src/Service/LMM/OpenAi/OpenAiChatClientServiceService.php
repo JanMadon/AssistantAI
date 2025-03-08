@@ -209,131 +209,38 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
         return $this->gptRequest($payload);
     }
 
-    public function imageGeneration($prompt)
+    public function imageGeneration($prompt): string
     {
-        $payload = [
-            'model'=>'dall-e-3',
-            'prompt'=>$prompt,
-            'n' => 1,
-            'size' => '1024x1024' // 1024x1024, 1024x1792 or 1792x1024
-        ];
+        $request = (new RequestBuilder())
+            ->setSystemPrompt($prompt)
+            ->getResult();
 
-        try{
-            $response = $this->httpClient->request(
-                'POST',
-                'https://api.openai.com/v1/images/generations',
-                [
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $this->config->get('API_KEY_OPENAI'),
-                        'Content-Type' => 'application/json'
-                    ],
-                    'json' => $payload
-                ]
+        $res = $request->makeDallE3Request();
 
-            );
-            $response = $response->getContent(false);
-        } catch (ClientExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $e) {
-            $response = $e->getMessage();
-        }
-        return json_decode($response)->data[0]->url;
+        return $res->getUrlResult();
     }
 
 
-
-    function makeEmbeding($input): array 
+    function Embedding($input): array
     {
-        $payload = [
-            'model' => 'text-embedding-ada-002', // vectors size: 1536 
-            'encoding_format' => 'float',
-            'input' => json_encode($input)
-        ];
+        $request = (new RequestBuilder())
+            ->setModel('text-embedding-ada-002')
+            ->setSystemPrompt($input)
+            ->getResult();
 
-        try {
+        $res = $request->makeEmbeddings();
+        if($res->responseStatus === Request::ERROR){
+            throw new \Exception($res->errorMessages);
+        }
 
-            $request = $this->httpClient->request(
-                'POST',
-                'https://api.openai.com/v1/embeddings',
-                [
-                    'json' => $payload,
-                    'headers' => [
-                        'Content-Type' => 'application/json',
-                        'Accept' => 'application/json',
-                        'Content-Length: ' . strlen(json_encode($payload)),
-                        'Authorization' => 'Bearer ' . $this->config->get('API_KEY_OPENAI')
-                    ]
-                ]
-
-            );
-
-            $response = json_decode($request->getContent(false))->data[0]->embedding;;
-
-        } catch (ClientException $exception) {
-            $response = $exception->getMessage();
-        }  catch (HttpExceptionInterface $exception) {
-            $response = $exception->getMessage();
-        } catch (\Exception $exception) {
-            $response = 'Unexpected error: ' . $exception->getMessage();
-        } 
-
-        return (array) $response;
+        return $res->getEmbeddingResult();
     }
 
     public function getChatModels(): array
     {
-        try {
-            $response = $this->httpClient->request(
-                'GET',
-                'https://api.openai.com/v1/models',
-                [
-                   'headers' => [
-                       'Accept' => 'application/json',
-                       'Authorization' => 'Bearer ' . $this->config->get('API_KEY_OPENAI')
-                   ]
-                ]);
-            $response = json_decode($response->getContent(false));
-        } catch (ClientException $exception) {
-            $response = $exception->getMessage();
-        }  catch (HttpExceptionInterface $exception) {
-            $response = $exception->getMessage();
-        } catch (\Exception $exception) {
-            $response = 'Unexpected error: ' . $exception->getMessage();
-        } catch (TransportExceptionInterface $e) {
-        }
+        $res = (new Request())->models();
 
-        if(isset($response->data)){
-            return array_map(fn($model) => new ChatModel($model->id, $model->id), $response->data);
-        }
-
-        return [];
-    }
-
-    private function prepareConversationArray(array|string $conversation): array
-    {
-        if(is_string($conversation)){
-            return [[
-                'role'=>'user',
-                'content'=> $conversation
-            ]];
-        }
-
-        $preparedConversation = [];
-        foreach ($conversation as $messages) {
-
-            if (property_exists($messages, 'User')) {
-                $preparedConversation[] = [
-                    'role' => 'user',
-                    'content' => $messages->User
-                ];
-            }
-            if (property_exists($messages, 'AI')) {
-                $preparedConversation[] = [
-                    'role' => 'assistant',
-                    'content' => $messages->AI
-                ];
-            }
-        }
-
-        return $preparedConversation;
+        return $res->getModelsResult();
     }
 
 

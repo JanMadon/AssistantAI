@@ -54,6 +54,19 @@ class RequestBuilder
         return $this;
     }
 
+    public function setPromptWithImageUrl(string $prompt, string $imageUrls): RequestBuilder
+    {
+        $this->request->conversation = [
+            'role' => 'user',
+            'content' => [
+                ['type' => 'text','text' => $prompt],
+                ['type' => 'image_url', 'image_url' => ['url' => $imageUrls]]
+            ],
+
+        ];
+        return $this;
+    }
+
     public function setTemperature(?float $temperature): RequestBuilder
     {
         $this->request->temperature = $temperature;
