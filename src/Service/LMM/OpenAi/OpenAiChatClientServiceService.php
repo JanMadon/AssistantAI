@@ -113,38 +113,31 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
 
     public function prompt(Conversation $conversation): ResponseLmmDto
     {
-        $payload = [
-            'model' => $conversation->getModelId(),
-            'messages' => [[
-                    'role' => 'system',
-                    'content' => $conversation->getSystemField(),
-                ], ...array_map(function($message) {
-                return [
-                    'role' => strtolower($message->getAuthor()) === 'user' ? 'user' : 'assistant',
-                    'content' => $message->getContent()
-                ];
-            }, $conversation->getMessages()->toArray())]
-        ];
-        // todo use builder to make payload ??
-        if($conversation->getMaxToken()){
-            $payload['max_tokens'] = $conversation->getMaxToken();
-        }
+        $request = (new RequestBuilder())
+            ->setUrl(self::URL_OPENAI['standard'])
+            ->setApiKey($this->config->get('API_KEY_OPENAI'))
+            ->setModel($conversation->getModelId())
+            ->setSystemPrompt($conversation->getSystemField())
+            ->setConversation($conversation->getMessages())
+            ->setTemperature($conversation->getTemperature())
+            ->setMaxToken($conversation->getMaxToken())
+            ->setStream(false)
+            ->getResult();
 
-        if($conversation->getTemperature()){
-            $payload['temperature'] = $conversation->getTemperature();
+        $res = $request->makeRequest();
+        if($res->responseStatus === Request::ERROR){
+            throw new \Exception($res->errorMessages);
         }
-
-        $response = $this->gptRequest($payload);
 
         return new ResponseLmmDto(
             $conversation,
-            $response->id ?? 'error',
-            $response->choices[0]->message->role ?? 'error',
-            $response->choices[0]->message->content ?? 'error',
-            $response->model ?? 'error',
-            $response->usage->prompt_tokens ?? 0,
-            $response->usage->completion_tokens ?? 0,
-            $response->usage->total_tokens?? 0,
+            $res->getResponseId(),
+            $res->getRole(),
+            $res->getStandardContent(),
+            $res->getModelName(),
+            $res->getUsedTokens()['prompt'],
+            $res->getUsedTokens()['completion'],
+            $res->getUsedTokens()['total'],
         );
 
     }
