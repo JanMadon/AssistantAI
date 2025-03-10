@@ -3,6 +3,7 @@
 namespace App\Service\LMM\OpenAi;
 
 use App\ValueObjects\LLM\ChatModel;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
@@ -25,16 +26,22 @@ class Request
     public string $apiKey;
     public string $model;
     public string $systemPrompt;
+    public string $userPrompt;
     public array $conversation;
     public ?float $temperature;
     public ?int $maxTokens;
     public ?bool $stream;
-
     public string $responseStatus;
     public string $errorMessages;
     public object $result;
+    public array $functions;
+    public bool $jsonMode;
 
 
+    public function __construct(ParameterBagInterface $parameterBag)
+    {
+        $this->apiKey = $parameterBag->get('API_KEY_OPENAI');
+    }
 
     public function makeGptRequest(): self
     {
@@ -52,11 +59,29 @@ class Request
         if($this->maxTokens){
             $payload['max_tokens'] = $this->maxTokens;
         }
+        if($this->jsonMode){
+            $payload['response_format'] = ['type' => 'json_object'];
+        }
         if($this->stream){
             $payload['stream'] = $this->stream;
         }
-
         $this->request(self::URL_OPENAI['standard'], $payload);
+        return $this;
+    }
+
+    public function makeFunctionCallingRequest(): self
+    {
+        $payload = [
+            'model' => $this->model,
+            'messages' => [
+                ['role' => 'system', 'content' => $this->systemPrompt],
+                ['role' => 'user', 'content' => $this->userPrompt],
+            ],
+            'function_calling' => $this->functions,
+            'function_call' => 'auto',
+        ];
+        $this->request(self::URL_OPENAI['standard'], $payload);
+
         return $this;
     }
 
@@ -109,7 +134,15 @@ class Request
     {
         return array_map(fn($model) => new ChatModel($model->id, $model->id), $this->result->data) ?? [];
     }
+    public function getFunction(): string
+    {
+        return $this->result->choices[0]->message->function_call->name ?? 'empty';
+    }
 
+    public function getFunctionArguments(): array
+    {
+        return json_decode($responseLmm->choices[0]->message->function_call->arguments,true) ?? [];
+    }
 
     public function getResponseId():string
     {

@@ -6,7 +6,6 @@ use App\DTO\LMM\Prompt\PromptDto;
 use App\DTO\LMM\Prompt\ResponseLmmDto;
 use App\Entity\Conversation;
 use App\Service\LMM\ChatClientServiceInterface;
-use App\ValueObjects\LLM\ChatModel;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpClient\Exception\ClientException;
@@ -34,6 +33,7 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
     public function __construct(
         private readonly  ParameterBagInterface $config,
         private readonly HttpClientInterface $httpClient,
+        private readonly RequestBuilder $requestBuilder,
         KernelInterface $kernel
     )
     {
@@ -42,37 +42,28 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
 
     public function functionCalling(PromptDto $prompt): ResponseLmmDto
     {
-        $payload = [
-            'model' => $prompt->model,
-            'messages' => [
-                [
-                    'role' => 'system',
-                    'content' => $prompt->system_field
-                ],
-                [   'role' => 'user',
-                    'content' => $prompt->content
-                ]
-            ],
-            'functions' => $prompt->functions,
-            'function_call' => 'auto',
-        ];
-        $responseLmm = $this->gptRequest($payload);
-        dump($responseLmm);
+        $request = $this->requestBuilder
+            ->setModel($prompt->model)
+            ->setSystemPrompt($prompt->system_field)
+            ->setUserPrompt($prompt->content)
+            ->setFunctionCalling($prompt->functions)
+            ->getResult();
+
+        $res = $request->makeFunctionCallingRequest();
+
         $response = new ResponseLmmDto(
             null,
-            $responseLmm->id ?? 'error',
-            $responseLmm->choices[0]->message->role ?? 'error',
-            $responseLmm->choices[0]->message->content ?? 'empty',
-            $responseLmm->model ?? 'error',
-            $responseLmm->usage->prompt_tokens ?? 0,
-            $responseLmm->usage->completion_tokens ?? 0,
-            $responseLmm->usage->total_tokens?? 0,
+            $res->getResponseId(),
+            $res->getRole(),
+            $res->getStandardResult(),
+            $res->getModelName(),
+            $res->getUsedTokens()['prompt'],
+            $res->getUsedTokens()['completion'],
+            $res->getUsedTokens()['total'],
         );
-        $response->use_function = $responseLmm->choices[0]->message->function_call->name ?? null;
-        $response->function_arguments = json_decode(
-            $responseLmm->choices[0]->message->function_call->arguments,
-            true)
-            ?? [];
+
+        $response->use_function = $res->getFunction();
+        $response->function_arguments = $res->getFunctionArguments();
 
         return $response;
 
@@ -113,9 +104,7 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
 
     public function prompt(Conversation $conversation): ResponseLmmDto
     {
-        $request = (new RequestBuilder())
-            ->setUrl(self::URL_OPENAI['standard'])
-            ->setApiKey($this->config->get('API_KEY_OPENAI'))
+        $request = $this->requestBuilder
             ->setModel($conversation->getModelId())
             ->setSystemPrompt($conversation->getSystemField())
             ->setConversation($conversation->getMessages())
@@ -124,7 +113,7 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
             ->setStream(false)
             ->getResult();
 
-        $res = $request->makeRequest();
+        $res = $request->makeGptRequest();
         if($res->responseStatus === Request::ERROR){
             throw new \Exception($res->errorMessages);
         }
@@ -133,7 +122,7 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
             $conversation,
             $res->getResponseId(),
             $res->getRole(),
-            $res->getStandardContent(),
+            $res->getStandardResult(),
             $res->getModelName(),
             $res->getUsedTokens()['prompt'],
             $res->getUsedTokens()['completion'],
@@ -144,34 +133,26 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
 
     public function promptVisionModelWithUrlImage(promptDto $promptDto): ResponseLmmDto
     {
-        $payload = [
-            'model' => $promptDto->model,
-            'messages' => [
-                [
-                    'role' => 'user',
-                    'content' => [
-                        [
-                            'type' => 'text',
-                            'text' => $promptDto->content
-                        ],
-                        [
-                            'type' => 'image_url',
-                            'image_url' => ['url' => $promptDto->function_arguments['url']]
-                        ]
-                    ]
-                ]
-            ]
-        ];
-        $responseLmm = $this->gptRequest($payload);
+        $request = $this->requestBuilder
+            ->setModel($promptDto->model)
+            ->setSystemPrompt($promptDto->system_field)
+            ->setImage($promptDto->content, $promptDto->function_arguments['url'])
+            ->getResult();
+
+        $res = $request->makeGptRequest();
+        if($res->responseStatus === Request::ERROR){
+            throw new \Exception($res->errorMessages);
+        }
+
         return new ResponseLmmDto(
             null,
-            $responseLmm->id ?? 'error',
-            $responseLmm->choices[0]->message->role ?? 'error',
-            $responseLmm->choices[0]->message->content ?? 'empty',
-            $responseLmm->model ?? 'error',
-            $responseLmm->usage->prompt_tokens ?? 0,
-            $responseLmm->usage->completion_tokens ?? 0,
-            $responseLmm->usage->total_tokens?? 0,
+            $res->getResponseId(),
+            $res->getRole(),
+            $res->getStandardResult(),
+            $res->getModelName(),
+            $res->getUsedTokens()['prompt'],
+            $res->getUsedTokens()['completion'],
+            $res->getUsedTokens()['total'],
         );
     }
 
@@ -211,7 +192,7 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
 
     public function imageGeneration($prompt): string
     {
-        $request = (new RequestBuilder())
+        $request = $this->requestBuilder
             ->setSystemPrompt($prompt)
             ->getResult();
 
@@ -223,7 +204,7 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
 
     function Embedding($input): array
     {
-        $request = (new RequestBuilder())
+        $request = $this->requestBuilder
             ->setModel('text-embedding-ada-002')
             ->setSystemPrompt($input)
             ->getResult();
@@ -238,7 +219,9 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
 
     public function getChatModels(): array
     {
-        $res = (new Request())->models();
+        $request = $this->requestBuilder
+            ->getResult();
+        $res = $request->models();
 
         return $res->getModelsResult();
     }

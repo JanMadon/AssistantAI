@@ -9,9 +9,9 @@ use Doctrine\Common\Collections\Collection;
 class RequestBuilder
 {
     private Request $request;
-    public function __construct()
+    public function __construct(Request $request)
     {
-        $this->request = new Request();
+        $this->request = $request;
     }
 
     public function getResult(): Request
@@ -43,6 +43,12 @@ class RequestBuilder
         return $this;
     }
 
+    public function setUserPrompt(string $userPrompt): RequestBuilder
+    {
+        $this->request->userPrompt = $userPrompt;
+        return $this;
+    }
+
     public function setConversation(Collection $messages): RequestBuilder
     {
         $this->request->conversation = array_map(function($message) {
@@ -54,15 +60,18 @@ class RequestBuilder
         return $this;
     }
 
-    public function setPromptWithImageUrl(string $prompt, string $imageUrls): RequestBuilder
+    public function setImage(string $prompt, string $urlOrPath): RequestBuilder
     {
         $this->request->conversation = [
             'role' => 'user',
             'content' => [
                 ['type' => 'text','text' => $prompt],
-                ['type' => 'image_url', 'image_url' => ['url' => $imageUrls]]
+                ['type' => 'image_url', 'image_url' =>
+                    filter_var($urlOrPath, FILTER_VALIDATE_URL) ?
+                    ['url' => $urlOrPath] :
+                    [ "url" => "data:image/jpeg;base64," . base64_encode(file_get_contents($urlOrPath))]
+                ]
             ],
-
         ];
         return $this;
     }
@@ -76,6 +85,18 @@ class RequestBuilder
     public function setMaxToken(?int $maxTokens): RequestBuilder
     {
         $this->request->maxTokens = $maxTokens;
+        return $this;
+    }
+
+    public function setFunctionCalling(array $functionCalling): RequestBuilder
+    {
+        $this->request->functions = $functionCalling;
+        return $this;
+    }
+
+    public function jsonMode(bool $jsonMode = false): RequestBuilder
+    {
+        $this->request->jsonMode = $jsonMode;
         return $this;
     }
 
