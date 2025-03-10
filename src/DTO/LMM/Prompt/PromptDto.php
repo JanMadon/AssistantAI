@@ -41,7 +41,19 @@ class PromptDto
 
     public array $function_arguments;
 
-    public function __construct($conversation_id, $system_field, $role, $content, $model, $temperature, $max_token, $function_calling = false)
+    public ?string $file_name = null;
+
+    public function __construct(
+        $conversation_id,
+        $system_field,
+        $role,
+        $content,
+        $model,
+        $temperature,
+        $max_token,
+        $function_calling = false,
+        $file_name = null
+    )
     {
         $this->conversation_id = $conversation_id;
         $this->system_field = $system_field;
@@ -51,6 +63,8 @@ class PromptDto
         $this->temperature = $temperature;
         $this->max_token = $max_token;
         $this->is_function_calling = $function_calling;
+        $this->functions = [];
+        $this->file_name = $file_name;
     }
 
 
