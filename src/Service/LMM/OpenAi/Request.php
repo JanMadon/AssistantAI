@@ -2,12 +2,15 @@
 
 namespace App\Service\LMM\OpenAi;
 
+use App\Event\StreamDataEvent;
 use App\ValueObjects\LLM\ChatModel;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class Request
 {
@@ -203,6 +206,37 @@ class Request
 
         $this->responseStatus = self::ERROR;
         $this->errorMessages = $response;
+    }
+
+    private function streamRequest(string $method, string $url, array $body): void
+    {
+        $request = $this->httpClient->request($method, $url, $body);
+
+        foreach ($this->httpClient->stream($request) as $chunk) {
+            if ($chunk->isTimeout() === false && $chunk->isFirst() === true) {
+                //dump("Strumień rozpoczęty");
+            }
+
+            if ($chunk->isLast()) {
+                //dd("Strumień zakończony");
+            }
+
+            // Przetwarzanie zawartości
+            $data = $chunk->getContent();
+            $subChunks = explode("\n\n", trim($data));
+            foreach ($subChunks as $subChunk) {
+                if (str_starts_with($subChunk, 'data: ')) {
+                    $jsonSubChunk = substr($subChunk, 6);
+                    $decodedData = json_decode($jsonSubChunk);
+                    if(isset($decodedData->choices[0]->delta->content)) {
+                       $this->eventDispatcher->dispatch(new StreamDataEvent(
+                           $decodedData->choices[0]->delta->content,
+                       ), 'stream.data');
+                        // $this->result = yield $decodedData?->choices[0]?->delta?->content;
+                    }
+                }
+            }
+        }
     }
 
 }
