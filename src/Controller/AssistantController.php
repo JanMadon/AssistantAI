@@ -4,8 +4,10 @@ namespace App\Controller;
 use App\DTO\LMM\Prompt\PromptDto;
 use App\DTO\LMM\SettingLmmDto;
 use App\DTO\LMM\TemplateLmmDto;
+use App\Entity\Stream;
 use App\Repository\ConversationRepository;
 use App\Repository\LMM\SettingsLmmRepository;
+use App\Repository\StreamRepository;
 use App\Repository\TemplateRepository;
 use App\Service\Assistant\ChatService;
 use App\Service\LMM\OpenAi\OpenAiChatClientServiceService;
@@ -76,6 +78,7 @@ class AssistantController extends AbstractController
             $requestData->config->max_token,
             $requestData->config->function_calling,
             $requestData->additional->file_name ?? null,
+            $requestData->config->stream ?? false,
         );
         $this->validatorService->validateAndThrow($promptDto);
 
@@ -90,6 +93,43 @@ class AssistantController extends AbstractController
                 'total' => $responseChat->total_tokens
             ]
         ], 200);
+    }
+
+    #[Route('/api/assistant/prompt/sse', 'assistant_stream', methods:['GET'])]
+    public function assistantStreamResponse(EntityManagerInterface $entityManager): StreamedResponse
+    {
+        return new StreamedResponse(function () use($entityManager) {
+
+            /** @var StreamRepository $streamRepository */
+            $streamRepository = $entityManager->getRepository(Stream::class);
+            $startTime = time();
+            $timeout = 30;
+
+            while (time() - $startTime < $timeout) {
+                $stream = $streamRepository->getStream();
+
+                if (!is_null($stream)) {
+                    $chunk = $stream->getChunk();
+                    $streamRepository->removeStream($stream);
+                    if ($chunk === 'finished_stream') break;
+
+                    echo "data: " . json_encode($chunk) . "\n\n";
+                    flush();
+                } else {
+                    echo "data: " . json_encode('') . "\n\n";
+                    flush();
+                }
+            }
+
+            echo "event: done\n";
+            echo "data: done\n\n";
+            flush();
+
+        }, 200, [
+            'Content-Type' => 'text/event-stream',
+            'Cache-Control' => 'no-cache',
+            'Connection' => 'keep-alive'
+        ]);
     }
 
     #[Route('/api/assistant/prompt/file', name:'assistant_prompt_file', methods:['POST'])]
@@ -157,29 +197,32 @@ class AssistantController extends AbstractController
     #[Route('/api/assistant/test', 'test-stream')]
     public function streamAction(): StreamedResponse
     {
-        // !!!!! note it doesn't work with development server, I used nginx
         $data = [
             ['id' => 1, 'name' => 'John Doe'],
             ['id' => 2, 'name' => 'Jane Doe'],
             ['id' => 3, 'name' => 'Mary Smith'],
-            ['id' => 3, 'name' => 'Mary Smith'],
-            ['id' => 3, 'name' => 'Mary Smith'],
-            ['id' => 3, 'name' => 'Mary Smith'],
-            ['id' => 3, 'name' => 'Mary Smith'],
+            ['id' => 4, 'name' => 'Michael Brown'],
         ];
 
         return new StreamedResponse(function () use ($data) {
-            // Stream each JSON object one at a time
             foreach ($data as $item) {
-                echo json_encode($item) . "\n";
-                // Flush output buffer to ensure data is sent immediately
+                echo "data: " . json_encode($item) . "\n\n";
+
                 flush();
+
                 sleep(1);
             }
-        }, 200, [
-            'Content-Type' => 'application/json',
-            'X-Accel-Buffering' => 'no',
-        ]);
 
+            echo "event: done\n";
+            echo "data: Stream finished\n\n";
+
+            flush();
+        }, 200, [
+            'Content-Type' => 'text/event-stream',
+            'Cache-Control' => 'no-cache',
+            'Connection' => 'keep-alive',
+            'X-Accel-Buffering' => 'no', // Dla serwera proxy jak Nginx (przyspiesza wysyłanie w trybie SSE)
+        ]);
     }
+
 }

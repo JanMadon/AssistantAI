@@ -43,6 +43,8 @@ class PromptDto
 
     public ?string $file_name = null;
 
+    public bool $stream = false;
+
     public function __construct(
         $conversation_id,
         $system_field,
@@ -52,7 +54,8 @@ class PromptDto
         $temperature,
         $max_token,
         $function_calling = false,
-        $file_name = null
+        $file_name = null,
+        $stream = false
     )
     {
         $this->conversation_id = $conversation_id;
@@ -65,6 +68,7 @@ class PromptDto
         $this->is_function_calling = $function_calling;
         $this->functions = [];
         $this->file_name = $file_name;
+        $this->stream = $stream;
     }
 
 

@@ -110,7 +110,7 @@ class OpenAiChatClientServiceService implements ChatClientServiceInterface
             ->setConversation($conversation->getMessages())
             ->setTemperature($conversation->getTemperature())
             ->setMaxToken($conversation->getMaxToken())
-            ->setStream(false)
+            ->setStream(true)
             ->getResult();
 
         $res = $request->makeGptRequest();

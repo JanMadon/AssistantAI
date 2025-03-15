@@ -3,6 +3,7 @@
 namespace App\Service\LMM\OpenAi;
 
 use App\Event\StreamDataEvent;
+use App\Repository\StreamRepository;
 use App\ValueObjects\LLM\ChatModel;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -38,10 +39,15 @@ class Request
     public string $errorMessages;
     public object $result;
     public array $functions;
-    public bool $jsonMode;
+    public bool $jsonMode = false;
 
 
-    public function __construct(ParameterBagInterface $parameterBag)
+    public function __construct(
+        private readonly HttpClientInterface $httpClient,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly StreamRepository $streamRepository,
+        ParameterBagInterface $parameterBag
+    )
     {
         $this->apiKey = $parameterBag->get('API_KEY_OPENAI');
     }
@@ -65,10 +71,15 @@ class Request
         if($this->jsonMode){
             $payload['response_format'] = ['type' => 'json_object'];
         }
+
         if($this->stream){
-            $payload['stream'] = $this->stream;
+            $payload['stream'] = true;
+            $this->streamRequest(self::URL_OPENAI['standard'],$payload);
+
+        } else{
+            $this->request(self::URL_OPENAI['standard'], $payload);
         }
-        $this->request(self::URL_OPENAI['standard'], $payload);
+
         return $this;
     }
 
@@ -183,7 +194,7 @@ class Request
         ];
         if($payload){
             $method = 'POST';
-            $body['json'] = json_encode($payload);
+            $body['json'] = $payload;
             $body['headers']['Content-Type'] = 'application/json';
         }
 
@@ -208,35 +219,66 @@ class Request
         $this->errorMessages = $response;
     }
 
-    private function streamRequest(string $method, string $url, array $body): void
+    private function streamRequest(string $url, array $body): void
     {
-        $request = $this->httpClient->request($method, $url, $body);
+        $payload = [
+            'headers' => [
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Content-Type' => 'application/json',
+            ],
+            'json' => $body,
+        ];
 
-        foreach ($this->httpClient->stream($request) as $chunk) {
-            if ($chunk->isTimeout() === false && $chunk->isFirst() === true) {
-                //dump("Strumień rozpoczęty");
-            }
+        try {
+            $request = $this->httpClient->request('POST', $url, $payload);
 
-            if ($chunk->isLast()) {
-                //dd("Strumień zakończony");
+            foreach ($this->httpClient->stream($request) as $chunk) {
+                $this->getStreamData($chunk);
             }
+        } catch (TransportExceptionInterface $e) {
+            dump($e->getMessage());
 
-            // Przetwarzanie zawartości
-            $data = $chunk->getContent();
-            $subChunks = explode("\n\n", trim($data));
-            foreach ($subChunks as $subChunk) {
-                if (str_starts_with($subChunk, 'data: ')) {
-                    $jsonSubChunk = substr($subChunk, 6);
-                    $decodedData = json_decode($jsonSubChunk);
-                    if(isset($decodedData->choices[0]->delta->content)) {
-                       $this->eventDispatcher->dispatch(new StreamDataEvent(
-                           $decodedData->choices[0]->delta->content,
-                       ), 'stream.data');
-                        // $this->result = yield $decodedData?->choices[0]?->delta?->content;
-                    }
-                }
-            }
+        }
+        if(empty($this->responseStatus)){
+            $this->responseStatus = self::ERROR;
+            $this->errorMessages = 'Something went wrong with the stream.: ' . $e->getMessage();
         }
     }
 
+    private function getStreamData($chunk): void
+    {
+        if ($chunk->isTimeout() === false && $chunk->isFirst() === true) {
+            dump("Strumień rozpoczęty");
+        }
+        if ($chunk->isLast()) {
+            $this->streamRepository->save('finished_stream');;
+        }
+
+        $data = $chunk->getContent();
+        $subChunks = explode("\n\n", trim($data));
+        foreach ($subChunks as $subChunk) {
+            if (str_starts_with($subChunk, 'data: ')) {
+                $jsonSubChunk = substr($subChunk, 6);
+                $decodedData = json_decode($jsonSubChunk);
+
+                if(isset($decodedData->id) && empty($this->responseStatus)){
+
+                    $this->responseStatus = self::SUCCESS;
+                }
+
+                if(isset($decodedData->choices[0]->delta->content)) {
+                    if(empty($this->result)){
+                        $this->result = $decodedData;
+                    } else {
+                        dump($decodedData);
+                        $this->result->choices[0]->delta->content .= $decodedData->choices[0]->delta->content;
+                    }
+
+                    $this->streamRepository->save($decodedData->choices[0]->delta->content);
+                }
+            }
+        }
+
+    }
 }

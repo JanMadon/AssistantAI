@@ -264,6 +264,26 @@
                 });
         }
 
+        /** CONNECT WITH SEE - Start listening*/
+        const listenResponse = function() {
+            const eventSource = new EventSource("{{ path('assistant_stream') }}");
+
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log(data);
+                renderAIChat(data)
+            };
+
+            eventSource.addEventListener('done', (event) => {
+                console.log('Stream finished:', event.data)
+                eventSource.close();
+            })
+
+            eventSource.onerror = (err) => {
+                console.error('SSE connection error', err);
+                eventSource.close();
+            };
+        }
 
 
         /** SEND SIMPLE USER MESSAGE */
@@ -296,7 +316,8 @@
                 'config': {
                     'temperature': temperatureNumber.value,
                     'max_token': maxTokenNumber.value,
-                    'function_calling': document.getElementById("use-function-calling").checked ?? false
+                    'function_calling': document.getElementById("use-function-calling").checked ?? false,
+                    'stream': true,
                 },
                 'additional': {
                     'file_name': fileName
@@ -304,32 +325,50 @@
             }
             console.log(data)
 
-            userInput.value = ''
+            if(data.config.stream){
+                listenResponse()
+                await requestChat(data)
+            } else {
+                renderAIChat(await requestChat(data));
+            }
 
-            let aiMessage = document.createElement('div');
-            aiMessage.className = 'conversation ai';
-            aiMessage.innerHTML = 'AI: ' + await requestChat(data);
-            chatBox.appendChild(aiMessage);
+            userInput.value = ''
             document.getElementById('userInput').value = '';
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        async function requestChat(data) {
-            console.log(JSON.stringify(data))
-
-            try {
-                const response = await axios.post("{{ path('assistant_prompt') }}", data)
-                console.log(response)
-                conversation_id = response.data.id
-                totalTokenCounter += response.data.usage_tokens.total
-                document.getElementById('total-prompt-num').textContent = totalTokenCounter
-                document.getElementById('last-prompt-num').textContent = response.data.usage_tokens.total
-                return response.data.answer
-
-            } catch (error) {
-                console.error(error)
-                return  error
+        function getOrCreateAIMessage(chatBox) {
+            if(chatBox.lastElementChild.className === 'conversation ai') {
+                return chatBox.lastElementChild
             }
+            let aiMessage = document.createElement('div');
+            aiMessage.className = 'conversation ai';
+            aiMessage.innerHTML = 'AI: ';
+            return chatBox.appendChild(aiMessage);
+
+        }
+
+        function renderAIChat(data) {
+            let chatBox = document.getElementById('chatBox');
+            let aiMessage = getOrCreateAIMessage(chatBox)
+            aiMessage.innerHTML += data;
+        }
+
+        async function requestChat(data) {
+            return axios.post("{{ path('assistant_prompt') }}", data)
+                .then(response => {
+                    console.log(response)
+                    conversation_id = response.data.id
+                    totalTokenCounter += response.data.usage_tokens.total
+                    document.getElementById('total-prompt-num').textContent = totalTokenCounter
+                    document.getElementById('last-prompt-num').textContent = response.data.usage_tokens.total
+                    return response.data.answer
+                })
+                .catch(error => {
+                    console.error(error)
+                    return error
+                })
+            ;
         }
 
 
