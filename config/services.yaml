@@ -57,3 +57,8 @@ services:
     App\EventListener\ExceptionListener:
         tags:
             - { name: kernel.event_listener, event: kernel.exception }
+
+    App\EventListener\StreamDataListener:
+        tags:
+            - { name: kernel.event_listener, event: stream.data }
+
