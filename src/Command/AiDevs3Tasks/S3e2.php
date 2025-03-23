@@ -17,7 +17,7 @@ class S3e2 extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $question = 'W raporcie, z którego dnia znajduje się wzmianka o kradzieży prototypu broni?';
-        $emb_question = $this->GPTservice->makeEmbeding($question); 
+        $emb_question = $this->GPTservice->Embedding($question);
         
         /*
         POST collections/test_collection/points/search
@@ -135,7 +135,7 @@ class S3e2 extends BaseCommand
             };
 
             //generate embeding
-            $embeding = $this->GPTservice->makeEmbeding($fileContent);
+            $embeding = $this->GPTservice->Embedding($fileContent);
             if(count($embeding) != 1536){
                 dump('error with embeding response');
                 dd($embeding);

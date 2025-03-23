@@ -42,5 +42,8 @@ yarn-error.log
 /.idea/sshConfigs.xml
 /.idea/vcs.xml
 /.idea/webServers.xml
+/.idea
 
 /docker/www_logs/*
+/raft_state.json
+/aliases/data.json
